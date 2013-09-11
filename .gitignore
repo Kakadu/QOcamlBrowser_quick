@@ -1,0 +1,12 @@
+camlcode.o.startup.s
+qocamlbrowser
+# C++
+.moc
+.pch
+.obj
+#folderlistmodel stuff
+Qt/
+folderlistmodel/libqmlfolderlistmodelplugin.prl
+folderlistmodel/libqmlfolderlistmodelplugin.so*
+# editor files
+*~
