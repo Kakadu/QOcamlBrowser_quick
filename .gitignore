@@ -1,9 +1,12 @@
 camlcode.o.startup.s
+*.cm[ixoa]
+*.o
 qocamlbrowser
 # C++
 .moc
 .pch
 .obj
+qrc_*.cpp
 #folderlistmodel stuff
 Qt/
 folderlistmodel/libqmlfolderlistmodelplugin.prl

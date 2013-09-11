@@ -27,7 +27,7 @@ int main(int argc, char ** argv) {
     registerContext(QString("rootContext"), ctxt);
     doCaml();
 
-    component.loadUrl(QUrl("Root.qml"));
+    component.loadUrl(QUrl("qrc:/Root.qml"));
     QObject *topLevel = component.create(ctxt);
     if (component.isError()) {
       qDebug() << component.errors();

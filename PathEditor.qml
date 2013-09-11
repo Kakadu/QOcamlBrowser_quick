@@ -61,7 +61,7 @@ Rectangle {
 
             FolderListModel {
                 id: folderModel
-                folder: "/home/kakadu/.opam/4.00.1/lib"
+                folder: "file:/home/kakadu/.opam/4.00.1/lib"
                 showDotAndDotDot: true
                 showDirsFirst: true
                 showHidden: true
@@ -112,7 +112,7 @@ Rectangle {
                         anchors.right: parent.right
                         anchors.rightMargin: 10
                         visible: false
-                        source: "pics/plus-sign.png"
+                        source: "qrc:/pics/plus-sign.png"
                         MouseArea {
                             anchors.fill: parent
                             propagateComposedEvents: true
