@@ -14,7 +14,7 @@ OCAMLOPT=ocamlfind opt -package compiler-libs.common,unix -linkpkg -g
 CMX=helpers.cmx tree.cmx S.cmx Richify.cmx program.cmx
 
 .SUFFIXES: .qrc .cpp .h .o .ml .cmx .cmo .cmi
-.PHONY: all depend clean
+.PHONY: all depend clean install uninstall
 
 all: $(GEN_CMX) $(CMX)  library_code $(GEN_MOC) $(GEN_CPP) resources.qrc qrc_resources.cpp qrc_resources.o main.o
 	$(CLINK) -L`ocamlc -where` -L`ocamlfind query lablqml` \
