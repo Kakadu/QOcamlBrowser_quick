@@ -110,7 +110,7 @@ SplitView {
             selectByMouse: true
             readOnly: true
             textFormat: TextEdit.RichText
-
+            onLinkActivated: console.log("Link " + link + " is activated")
             text: {
                 if (controller.hasData) controller.descr
                 else "No description here"
