@@ -66,4 +66,15 @@ module List = struct
 
   let to_string xs ~f =
     map ~f xs |> String.concat "," |> sprintf "[%s]"
+
+  exception IntExc of int
+  let findn ~f xs =
+    let ans = fold_left ~init:(None,0) ~f:(fun (acc,n) x ->
+      match acc with
+      | Some _ -> (acc,n)
+      | None -> if f x then (Some x,n) else (acc,n+1)
+    ) xs in
+    match ans with
+    | (Some x,n) -> Some(x,n)
+    | (None,_)   -> None
 end

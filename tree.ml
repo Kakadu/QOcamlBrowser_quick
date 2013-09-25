@@ -8,6 +8,10 @@ type 'a tree = {
 }
 open Types
 
+let is_module = function
+  | Types.Sig_module (_,_,_) -> true
+  | ___ -> false
+
 let name_of_item = function
   | Types.Sig_value     ({Ident.name;_},_)   -> name
   | Types.Sig_type      ({Ident.name;_},_,_) -> name

@@ -39,7 +39,7 @@ SplitView {
                 contentItem: ListView {
                     id: lv1
                     anchors.fill: parent
-                    currentIndex: -1
+                    currentIndex: model.hardcodedSelectedIndex
 
                     highlight: Rectangle {
                         color: backgroundColor
@@ -70,7 +70,6 @@ SplitView {
                             onClicked: {
                                 lv1.currentIndex = index;
                                 controller.onItemSelected(mainIndex,index);
-                                currentPathHolder.text = controller.getFullPath()
                             }
                         }
                     }
@@ -90,13 +89,14 @@ SplitView {
             left: mainView.left
             right: mainView.right
         }
-        text: ""
+        text: controller.fullPath
     }
 
     ScrollView {
         id: descriptionTextFieldHolder
-        anchors.left: currentPathHolder.left
-        anchors.right: currentPathHolder.right
+        anchors { left: currentPathHolder.left
+                  right: currentPathHolder.right
+                }
         Layout.minimumHeight: 100
         Layout.maximumHeight: 400
         height: 300
@@ -110,10 +110,10 @@ SplitView {
             selectByMouse: true
             readOnly: true
             textFormat: TextEdit.RichText
-            onLinkActivated: console.log("Link " + link + " is activated")
+            onLinkActivated: controller.linkActivated(link)
             text: {
                 if (controller.hasData) controller.descr
-                else "No description here"
+                else ""
             }
         }
     }

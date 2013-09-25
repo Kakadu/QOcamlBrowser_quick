@@ -36,17 +36,23 @@ class virtual abstractListModel cppobj = object(self)
     else QModelIndex.empty
   method columnCount _ = 1
   method hasChildren _ = self#rowCount QModelIndex.empty > 0
+  val mutable curIndex = -1
+  method getHardcodedIndex () = curIndex
+  method setHardCodedIndex v =
+    if v <> curIndex then (curIndex <- v;
+                           self#emit_hardcodedIndexChanged v)
 end
 
 let update_paths xs =
-  printf "Setting new paths:\n%s\n%!" (List.to_string xs ~f:(sprintf "%s"));
   options.path <- xs;
   S.(read_modules options.path |> build_tree |> sort_tree)
-let root = ref (update_paths options.path)
-let selected = ref [-1]
-let cpp_data: (abstractListModel * DataItem.base_DataItem list) list ref  = ref []
 
-let cpp_data_helper ys =
+let root : Types.signature_item Tree.tree ref = ref (update_paths options.path)
+let selected: int list ref = ref [-1]
+let cpp_data: (abstractListModel * DataItem.base_DataItem list) list ref  = ref []
+let last_described = ref []
+
+let cpp_data_helper (ys: Types.signature_item Tree.tree list list) =
   let f xs =
     let data = List.map xs ~f:(fun {Tree.name;Tree.internal;_} ->
       let cppObj = DataItem.create_DataItem () in
@@ -63,6 +69,7 @@ let cpp_data_helper ys =
       object(self)
         inherit abstractListModel cppobj as super
         method rowCount _ = List.length data
+
         method data index role =
           let r = QModelIndex.row index in
           if (r<0 || r>= List.length data) then QVariant.empty
@@ -82,8 +89,18 @@ let initial_cpp_data () : (abstractListModel * DataItem.base_DataItem list) list
   assert (List.length xs = 1);
   cpp_data_helper xs
 
+let describe controller new_selected =
+  last_described := new_selected;
+  let xs = Tree.proj !root new_selected in
+  let cur_item = List.last xs |> List.nth ~n:(List.last new_selected) in
+  let b = Buffer.create 500 in
+  let fmt = Format.(formatter_of_buffer b) in
+  Printtyp.signature fmt [cur_item.Tree.internal];
+  Format.pp_print_flush fmt ();
+  let desc = Buffer.contents b |> Richify.make in
+  controller#updateDescription desc
+
 let item_selected controller mainModel x y : unit =
-  printf "Item selected: %d,%d\n%!" x y;
   let last_row = List.length !cpp_data - 1 in
   let (new_selected,redraw_from) = Tree.change_state !selected (x,y) !root in
   let leaf_selected =
@@ -91,42 +108,103 @@ let item_selected controller mainModel x y : unit =
     (redraw_from=List.length new_selected)
   in
   selected := new_selected;
-
+  controller#emit_fullPath ();
   let cpp_data_head = List.take !cpp_data ~n:redraw_from in
   if redraw_from <= last_row then begin
-    printf "Delete some rows\n%!";
     mainModel#beginRemoveRows QModelIndex.empty redraw_from (List.length !cpp_data-1);
     cpp_data := cpp_data_head;
     mainModel#endRemoveRows ();
-    printf "Rows deleted!\n%!"
   end else begin
     cpp_data := cpp_data_head;
   end;
 
   let xs = Tree.proj !root new_selected in
   assert (List.length xs = List.length new_selected);
-  if leaf_selected then begin
-    let cur_item = List.last xs |> List.nth ~n:(List.last new_selected) in
-    let b = Buffer.create 500 in
-    let fmt = Format.(formatter_of_buffer b) in
-    Printtyp.signature fmt [cur_item.Tree.internal];
-    Format.pp_print_flush fmt ();
-    let desc = Buffer.contents b |> Richify.make  in
-    controller#updateDescription desc;
-  end else begin
+  if leaf_selected then
+    describe controller new_selected
+  else begin
     let xs = List.drop xs ~n:(List.length cpp_data_head) in
     let zs = cpp_data_helper xs in
     if List.length zs <> 0 then begin
       let from = List.length !cpp_data in
       let last = from + List.length zs-1 in
-      printf "Adding rows from %d to %d\n%!" from last;
       mainModel#beginInsertRows QModelIndex.empty from last;
       cpp_data := !cpp_data @ zs;
       mainModel#endInsertRows ();
-      printf "End inserting rows. cpp_data.length = %d\n%!" (List.length !cpp_data);
     end;
   end;
   assert (List.length !cpp_data = List.length new_selected)
+
+exception LinkFound of int list
+let onLinkActivated controller mainModel s =
+  let path = Str.(split (regexp "\\.") s) in
+  (* We should know base module of current item *)
+  let cur_root_module = List.nth ~n:(List.hd !selected) !root.Tree.sons in
+  let look_toplevel () =
+    try
+      (* Looking for link in most top-level entries *)
+      let ans = List.fold_left path ~init:(!root,[]) ~f:(fun (sign,ans) x ->
+       match List.findn ~f:(fun item -> Tree.name_of_item item.Tree.internal = x) sign.Tree.sons with
+       | Some (item,n) -> (item, n::ans)
+       | None -> raise Not_found
+      ) in
+      Some ans
+    with Not_found -> None
+  in
+  let look_curmodule () =
+    try
+    (* Looking for link in module which starts current path *)
+      Some (List.fold_left path ~init:(cur_root_module,[List.hd !selected]) ~f:(fun (sign,ans) x ->
+       match List.findn ~f:(fun item -> Tree.name_of_item item.Tree.internal = x) sign.Tree.sons with
+       | Some (item,n) -> (item, n::ans)
+       | None -> raise Not_found
+     ))
+    with Not_found -> None
+  in
+  let look_depthvalue () =
+    let last = !last_described in
+    assert (List.length last > 1);
+    let last = List.take ~n:(List.length last - 1) last in
+    let last_module = List.fold_left last ~init: !root ~f:(fun acc n -> List.nth ~n acc.Tree.sons) in
+    assert (Tree.is_module last_module.Tree.internal);
+    try
+      (* Looking for link in side currently selected module *)
+      Some (List.fold_left path ~init:(last_module, List.rev last) ~f:(fun (sign,ans) x ->
+       match List.findn ~f:(fun item -> Tree.name_of_item item.Tree.internal = x) sign.Tree.sons with
+       | Some (item,n) -> (item, n::ans)
+       | None -> raise Not_found
+     ))
+    with Not_found -> None
+  in
+  try
+    let ans = [look_toplevel (); look_curmodule (); look_depthvalue ()] in
+    if ans = [None;None;None] then raise Not_found;
+    let r = match ans with
+      | (Some x)::_ -> x
+      | _::(Some x)::_ -> x
+      | _::_::(Some x)::_ -> x
+      | _____ -> assert false
+    in
+    raise (LinkFound (List.rev (snd r)))
+  with
+  | LinkFound xs ->
+    let models = Tree.proj !root xs in
+    mainModel#beginRemoveRows QModelIndex.empty 0 (List.length !selected - 1);
+    cpp_data := [];
+    mainModel#endRemoveRows ();
+    (* TODO: rewrite generating of functions for listmodel with labels *)
+    mainModel#beginInsertRows QModelIndex.empty 0 (List.length xs - 1);
+    selected := xs;
+    cpp_data := cpp_data_helper models;
+
+    mainModel#endInsertRows ();
+    List.iter2 !cpp_data !selected ~f:(fun (m,_) v -> m#setHardCodedIndex v);
+    selected := xs;
+    controller#emit_fullPath ();
+    last_described := xs;
+    describe controller xs
+  | Not_found -> () (* printf "No link found!\n%!" *)
+
 
 let do_update_paths model xs =
   if options.path <> xs then begin
@@ -167,6 +245,7 @@ let main () =
   let controller_cppobj = Controller.create_Controller () in
   let controller = object(self)
     inherit Controller.base_Controller controller_cppobj as super
+    method linkActivated = onLinkActivated self model
     method onItemSelected x y =
       try
         item_selected self model x y
@@ -184,7 +263,9 @@ let main () =
         | None   ->
             eprintf "App have tried to access description which should not exist now";
             "<no description. Bug!>"
-    method getFullPath () =
+    method emit_fullPath () =
+      self#emit_fullPathChanged (self#fullPath ())
+    method fullPath () =
       let indexes = if List.last !selected = -1 then List.(!selected |> rev |> tl |> rev) else !selected in
       (*printf "List.length indexes = %d\n" (List.length indexes);*)
       assert (List.for_all (fun  x -> x>=0 ) indexes);
@@ -202,15 +283,8 @@ let main () =
       end;
       self#emit_descChanged info
   end in
-  (*
-  let () =
-    let c = Gc.get () in
-    c.Gc.max_overhead <- 1000001 (* disable compactions *)
-  in*)
 
   set_context_property ~ctx:(get_view_exn ~name:"rootContext") ~name:"myModel" model#handler;
   set_context_property ~ctx:(get_view_exn ~name:"rootContext") ~name:"controller" controller#handler
-
-
 
 let () = Callback.register "doCaml" main

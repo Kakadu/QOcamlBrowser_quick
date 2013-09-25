@@ -44,7 +44,6 @@ ApplicationWindow {
             Component.onCompleted: checked = false
             onTriggered: {
                 root.setCurrentPaths();
-                console.log(editPathsContainer.pathsModel)
                 root.state = "EDIT_PATHS";
             }
         }
@@ -99,4 +98,3 @@ ApplicationWindow {
         }
     }
 }
-

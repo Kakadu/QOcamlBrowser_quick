@@ -28,7 +28,6 @@ Rectangle {
         }
     }
     function addPath(s) {
-        console.log (typeof(s));
         if (s.startsWith("file://"))
             s = s.substr(7);
         pathModel.push(s);
@@ -99,10 +98,9 @@ Rectangle {
                                     folderModel.folder = folderModel.parentFolder;
                                 else if (fileIsDir) {
                                     folderModel.folder += "/" + fileName;
-                                    console.log("Change dir: " + folderModel.folder);
                                 }
-                                else
-                                    console.log ("clicked in file " + fileName);
+                                else {
+                                }
                             }
                         }
 
