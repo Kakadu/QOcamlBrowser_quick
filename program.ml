@@ -5,12 +5,10 @@ let () = Printexc.record_backtrace true
 
 type options =
     { mutable path: string list
-    ; mutable with_color: bool
     }
 
 let options =
   { path = [] (* ["/home/kakadu/.opam/4.00.1/lib/ocaml"; "/home/kakadu/.opam/4.00.1/lib/core"] *)
-  ; with_color = true
   }
 
 
@@ -63,7 +61,8 @@ let cpp_data_helper (ys: Types.signature_item Tree.tree list list) =
       end) in
     (* creating miniModel for this list *)
     let cppobj = AbstractModel.create_AbstractModel () in
-    AbstractModel.add_role cppobj 555 "qwe";
+    let innerModelMyRole = 556 in
+    AbstractModel.add_role cppobj innerModelMyRole "qwe";
 
     let o =
       object(self)
@@ -71,11 +70,11 @@ let cpp_data_helper (ys: Types.signature_item Tree.tree list list) =
         method rowCount _ = List.length data
 
         method data index role =
-          let r = QModelIndex.row index in
-          if (r<0 || r>= List.length data) then QVariant.empty
+          let n = QModelIndex.row index in
+          if (n<0 || n>= List.length data) then QVariant.empty
           else begin
-            if (role=0 || role=555) (* DisplayRole *)
-            then QVariant.of_object (List.nth data ~n:r)#handler
+            if (role=0 || role=innerModelMyRole) (* DisplayRole *)
+            then QVariant.of_object (List.nth data ~n)#handler
             else QVariant.empty
           end
       end
@@ -178,14 +177,10 @@ let onLinkActivated controller mainModel s =
   in
   try
     let ans = [look_toplevel (); look_curmodule (); look_depthvalue ()] in
-    if ans = [None;None;None] then raise Not_found;
-    let r = match ans with
-      | (Some x)::_ -> x
-      | _::(Some x)::_ -> x
-      | _::_::(Some x)::_ -> x
-      | _____ -> assert false
-    in
-    raise (LinkFound (List.rev (snd r)))
+    match List.catMaybes ans with
+    | []  -> raise Not_found
+    | [r] -> raise (LinkFound (List.rev (snd r)))
+    | _ -> assert false
   with
   | LinkFound xs ->
     let models = Tree.proj !root xs in
@@ -227,17 +222,18 @@ let main () =
   cpp_data := initial_cpp_data ();
 
   let cpp_model = AbstractModel.create_AbstractModel () in
-  AbstractModel.add_role cpp_model 555 "homm";
+  let myDefaultRoleMainModel = 555 in
+  AbstractModel.add_role cpp_model myDefaultRoleMainModel "homm";
 
   let model = object(self)
     inherit abstractListModel cpp_model as super
     method rowCount _ = List.length !cpp_data
     method data index role =
-      let r = QModelIndex.row index in
-      if (r<0 || r>= List.length !cpp_data) then QVariant.empty
+      let n = QModelIndex.row index in
+      if (n<0 || n>= List.length !cpp_data) then QVariant.empty
       else begin
-        if (role=0 || role=555) (* DisplayRole *)
-        then QVariant.of_object (List.nth !cpp_data ~n:r |> fst)#handler
+        if (role=0 || role=myDefaultRoleMainModel) (* DisplayRole *)
+        then QVariant.of_object (List.nth !cpp_data ~n |> fst)#handler
         else QVariant.empty
       end
   end in

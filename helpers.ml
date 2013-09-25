@@ -77,4 +77,8 @@ module List = struct
     match ans with
     | (Some x,n) -> Some(x,n)
     | (None,_)   -> None
+
+  let catMaybes xs =
+    fold_right ~init:[] xs ~f:(fun x acc -> match x with Some y -> y::acc | None -> acc)
+
 end
