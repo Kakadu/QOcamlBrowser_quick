@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.0
 SplitView {
     id: browseAPIContainer
     orientation: Qt.Vertical
+    Keys.onEscapePressed: Qt.quit()
 
     ListView {
         id: mainView
@@ -55,7 +56,6 @@ SplitView {
                     model: homm
                     spacing: 5
                     orientation: ListView.Vertical
-
                     delegate: Text {
                         anchors.rightMargin: 15
                         anchors.leftMargin: 5

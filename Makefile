@@ -5,13 +5,13 @@ CC=g++ -g -fPIC -std=c++0x `pkg-config --cflags Qt5Core` -I`ocamlfind query labl
 CLINK=g++ -g
 CLINKLIBS=`pkg-config --libs Qt5Quick`
 OUT=qocamlbrowser
-GEN_CMX=DataItem.cmx AbstractModel.cmx Controller.cmx
+GEN_CMX=DataItem.cmx AbstractModel.cmx Controller.cmx HistoryModel.cmx
 MOC_CPP=$(addprefix moc_,$(GEN_CMX:.cmx=_c.cpp) )
 GEN_CPP=$(GEN_CMX:.cmx=_c.o) $(MOC_CPP:.cpp=.o)
 GEN_MOC=$(GEN_CMX:.cmx=_c.cpp)
 OCAMLOPT=ocamlfind opt -package compiler-libs.common,unix -linkpkg -g
 
-CMX=helpers.cmx tree.cmx S.cmx Comb.cmx Richify.cmx program.cmx
+CMX=helpers.cmx tree.cmx S.cmx Comb.cmx Richify.cmx History.cmx program.cmx
 
 .SUFFIXES: .qrc .cpp .h .o .ml .cmx .cmo .cmi
 .PHONY: all depend clean install uninstall

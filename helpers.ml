@@ -82,3 +82,8 @@ module List = struct
     fold_right ~init:[] xs ~f:(fun x acc -> match x with Some y -> y::acc | None -> acc)
 
 end
+
+module Ref = struct
+  type 'a t = 'a ref
+  let replace x ~f = x := f !x
+end

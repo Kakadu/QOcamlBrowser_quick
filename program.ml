@@ -3,9 +3,7 @@ open Helpers
 
 let () = Printexc.record_backtrace true
 
-type options =
-    { mutable path: string list
-    }
+type options = { mutable path: string list }
 
 let options =
   { path = [] (* ["/home/kakadu/.opam/4.00.1/lib/ocaml"; "/home/kakadu/.opam/4.00.1/lib/core"] *)
@@ -49,6 +47,8 @@ let root : Types.signature_item Tree.tree ref = ref (update_paths options.path)
 let selected: int list ref = ref [-1]
 let cpp_data: (abstractListModel * DataItem.base_DataItem list) list ref  = ref []
 let last_described = ref []
+let is_smth_described () = List.length !last_described > 0
+let describe_nothing ()  = Ref.replace last_described ~f:(fun _ -> [])
 
 let cpp_data_helper (ys: Types.signature_item Tree.tree list list) =
   let f xs =
@@ -88,6 +88,13 @@ let initial_cpp_data () : (abstractListModel * DataItem.base_DataItem list) list
   assert (List.length xs = 1);
   cpp_data_helper xs
 
+let make_full_path selected =
+  let indexes = if List.last selected = -1 then List.(selected |> rev |> tl |> rev) else selected in
+  assert (List.for_all (fun  x -> x>=0 ) indexes);
+  let proj = Tree.proj !root indexes |> List.take ~n:(List.length indexes) in
+  assert (List.length proj = List.length indexes);
+  List.map2 proj indexes ~f:(fun xs n -> let x = List.nth xs ~n in x.Tree.name) |> String.concat "."
+
 let describe controller new_selected =
   last_described := new_selected;
   let xs = Tree.proj !root new_selected in
@@ -119,9 +126,12 @@ let item_selected controller mainModel x y : unit =
 
   let xs = Tree.proj !root new_selected in
   assert (List.length xs = List.length new_selected);
-  if leaf_selected then
+  if leaf_selected then begin
+    History.(o.forward#take ~count:(o.forward#count);
+             if is_smth_described () then o.back#prepend [make_full_path !last_described]
+             (*o.forward#prepend [make_full_path new_selected] *));
     describe controller new_selected
-  else begin
+  end else begin
     let xs = List.drop xs ~n:(List.length cpp_data_head) in
     let zs = cpp_data_helper xs in
     if List.length zs <> 0 then begin
@@ -196,6 +206,10 @@ let onLinkActivated controller mainModel s =
     List.iter2 !cpp_data !selected ~f:(fun (m,_) v -> m#setHardCodedIndex v);
     selected := xs;
     controller#emit_fullPath ();
+    (* When we go on link we add last item to backHistory and clear forward history *)
+    assert (is_smth_described ());
+    History.(o.back#prepend [make_full_path !last_described];
+             o.forward#takeAll );
     last_described := xs;
     describe controller xs
   | Not_found -> () (* printf "No link found!\n%!" *)
@@ -241,6 +255,10 @@ let main () =
   let controller_cppobj = Controller.create_Controller () in
   let controller = object(self)
     inherit Controller.base_Controller controller_cppobj as super
+    method forwardTo s i =
+      printf "OCaml: forward to '%s', %d\n%!" s i
+    method backTo s i =
+      printf "OCaml: back to '%s', %d\n%!" s i
     method linkActivated = onLinkActivated self model
     method onItemSelected x y =
       try
@@ -261,15 +279,7 @@ let main () =
             "<no description. Bug!>"
     method emit_fullPath () =
       self#emit_fullPathChanged (self#fullPath ())
-    method fullPath () =
-      let indexes = if List.last !selected = -1 then List.(!selected |> rev |> tl |> rev) else !selected in
-      (*printf "List.length indexes = %d\n" (List.length indexes);*)
-      assert (List.for_all (fun  x -> x>=0 ) indexes);
-      let proj = Tree.proj !root indexes |> List.take ~n:(List.length indexes) in
-      (*printf "List.length proj = %d\n%!" (List.length proj);*)
-      assert (List.length proj = List.length indexes);
-      List.map2 proj indexes ~f:(fun xs n -> let x = List.nth xs ~n in x.Tree.name) |> String.concat "."
-
+    method fullPath () = make_full_path !selected
     method updateDescription info =
       if self#isHasData () then begin
         desc <- Some info;
@@ -280,6 +290,7 @@ let main () =
       self#emit_descChanged info
   end in
 
+  History.init ();
   set_context_property ~ctx:(get_view_exn ~name:"rootContext") ~name:"myModel" model#handler;
   set_context_property ~ctx:(get_view_exn ~name:"rootContext") ~name:"controller" controller#handler
 

@@ -8,6 +8,7 @@ ApplicationWindow {
     property int defaultTextFieldHeight: defaultFontSize + 4
     property string backgroundColor: "#FFFFDF"
 
+    Keys.onEscapePressed: Qt.quit()
     menuBar: MenuBar {
         Menu {
             title: "File"
@@ -48,8 +49,63 @@ ApplicationWindow {
             }
         }
     }
+
     toolBar: ToolBar {
         RowLayout {
+            Menu {
+                id: backContextMenu
+                Instantiator {
+                    model: backModel
+                    MenuItem {
+                        text: model.text
+                        onTriggered: controller.backTo(model.text,-1);
+                    }
+                    onObjectAdded: {
+                        backContextMenu.insertItem(index,object)
+                        goBackAction.enabled = true;
+                    }
+                    onObjectRemoved: {
+                        backContextMenu.removeItem(object.text)
+                        if (backContextMenu.items.count == 0) goBackAction.enabled = false
+                    }
+                }
+            }
+            Menu {
+                id: forwardContextMenu
+                Instantiator {
+                    model: forwardModel
+                    MenuItem {
+                        text: model.text
+                        onTriggered: controller.forwardTo(model.text,-1);
+                    }
+                    onObjectAdded: {
+                        forwardContextMenu.insertItem(index,object)
+                        goForwardAction.enabled = true
+                    }
+                    onObjectRemoved: {
+                        forwardContextMenu.removeItem(object)
+                        if (forwardContextMenu.items.length==0) goForwardAction.enabled = false;
+                    }
+                }
+            }
+            Action {
+                id: goBackAction
+                enabled: false
+            }
+            Action {
+                id: goForwardAction
+                enabled: false
+            }
+            ToolButton {
+                action: goBackAction
+                text: "<-"
+                onClicked: if (backContextMenu.items.length>0) backContextMenu.popup()
+            }
+            ToolButton {
+                action: goForwardAction
+                text: "->"
+                onClicked: if (forwardContextMenu.items.length>0) forwardContextMenu.popup()
+            }
             ToolButton { text: "Path Editing"; action: path_editing_action }
             ToolButton { text: "API browsing"; action: api_browsing_action }
         }
