@@ -61,11 +61,13 @@ ApplicationWindow {
                         onTriggered: controller.backTo(model.text,-1);
                     }
                     onObjectAdded: {
+                        console.log("QML: object added: " + object.text + ", index= " + index);
                         backContextMenu.insertItem(index,object)
                         goBackAction.enabled = true;
                     }
                     onObjectRemoved: {
-                        backContextMenu.removeItem(object.text)
+                        backContextMenu.removeItem(object)
+                        console.log("QML: object removed: " + object.text);
                         if (backContextMenu.items.count == 0) goBackAction.enabled = false
                     }
                 }
@@ -84,6 +86,7 @@ ApplicationWindow {
                     }
                     onObjectRemoved: {
                         forwardContextMenu.removeItem(object)
+                        console.log("QML: object removed: " + object.text);
                         if (forwardContextMenu.items.length==0) goForwardAction.enabled = false;
                     }
                 }

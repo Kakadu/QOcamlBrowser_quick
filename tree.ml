@@ -72,7 +72,7 @@ let change_state (old_selected: int list) (x,y) root =
   (new_selected, redraw_start_from)
 
 let good_selected selected =
-  List.for_all selected ~f:((<=)0) || begin
+  List.for_all selected ~f:((<=)0) || (List.length selected = 0) || begin
     let xs = List.rev selected in
     let (h,tl) = List.(hd xs, tl xs) in
     (h= -1) && (List.for_all tl ~f:((<=)0) )
