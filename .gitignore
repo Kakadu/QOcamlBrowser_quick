@@ -1,3 +1,4 @@
+.depend
 camlcode.o.startup.s
 *.cm[ixoa]
 *.o
@@ -7,9 +8,5 @@ qocamlbrowser
 .pch
 .obj
 qrc_*.cpp
-#folderlistmodel stuff
-Qt/
-folderlistmodel/libqmlfolderlistmodelplugin.prl
-folderlistmodel/libqmlfolderlistmodelplugin.so*
 # editor files
 *~

@@ -1,9 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-hash mocml 2>/dev/null || { echo >&2 "I require mocml but it's not installed.  Aborting."; exit 1; }
+MOCML=mocml
+MOCML=../lablqt/src/mocml.native
+#set -x
+hash $MOCML 2>/dev/null || { echo >&2 "I require mocml but it's not installed.  Aborting."; exit 1; }
 echo "Executing generator"
-mocml input.json #-with-debug
+$MOCML input.json #-with-debug
 echo ""> .depend
 make depend
 
-./build_folderlistmodel
