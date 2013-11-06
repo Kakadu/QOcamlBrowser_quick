@@ -47,10 +47,9 @@ clean:
 
 install:
 	cp $(OUT) $(PREFIX)/bin
-	cp Qt $(PREFIX)/bin -r
 
 uninstall:
-	rm -fr $(PREFIX)/bin/$(OUT) $(PREFIX)/bin/Qt
+	rm -fr $(PREFIX)/bin/$(OUT)
 
 -include  $(shell ocamlc -where)/Makefile.config
 include .depend
