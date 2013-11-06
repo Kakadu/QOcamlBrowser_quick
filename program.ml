@@ -39,7 +39,6 @@ type options = {
 
 let options =
   { path = [Config.standard_library]
-  (* ["/home/kakadu/.opam/4.00.1/lib/ocaml"; "/home/kakadu/.opam/4.00.1/lib/core"] *)
   ; zipper = Obj.magic 1
   ; root = Obj.magic 1
   ; cpp_data = []
@@ -297,7 +296,11 @@ let main () =
         printf "Backtrace:\n%s\n%!" (Printexc.get_backtrace ());
         exit 0
     method paths () = options.path
-    method setPaths xs = do_update_paths model xs
+    method setPaths xs =
+      do_update_paths model xs;
+      self#updateDescription "";
+      self#emit_fullPath ()
+
     val mutable desc = None
     method isHasData () = match desc with Some _ -> true | _ -> false
     method getDescr () =
