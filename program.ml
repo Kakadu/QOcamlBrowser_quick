@@ -271,6 +271,9 @@ let main () =
   let controller_cppobj = Controller.create_Controller () in
   let controller = object(self)
     inherit Controller.base_Controller controller_cppobj as super
+
+    method getDefaultLibraryPath () = Config.standard_library
+
     method forwardTo s i =
       printf "OCaml: forward to '%s', %d\n%!" s i;
       HistoryZipper.find_forward ~zipper:options.zipper s;

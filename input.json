@@ -14,6 +14,8 @@
          "signature": ["string", "int", "unit"] }
       ,{ "name":      "forwardTo",
          "signature": ["string", "int", "unit"] }
+      ,{ "name":      "getDefaultLibraryPath",
+         "signature": ["unit", "string"] }
   ],
   "properties": [
     {  "name":   "hasData",
