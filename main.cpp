@@ -36,7 +36,7 @@ int main(int argc, char ** argv) {
         return 1;
     }
     QQuickWindow *window = qobject_cast<QQuickWindow*>(xs.at(0));
-    window->showMaximized(); 
+    window->setTitle("QOCamlBrowser");
+    window->showMaximized();
     return app.exec();
 }
-
