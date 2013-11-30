@@ -5,30 +5,28 @@ CC=g++ -g -fPIC -std=c++0x $(DO_QML_DEBUG) \
 	`pkg-config --cflags Qt5Core Qt5Widgets Qt5Quick` -I`ocamlfind query lablqml` -I`ocamlc -where` \
 	-Dprotected=public -Dprivate=public
 CLINK=g++ -g
-CLINKLIBS=`pkg-config --libs Qt5Quick Qt5Widgets`
+CLINKLIBS=-cclib -lstdc++ -ccopt -L$(shell qmake -query QT_INSTALL_LIBS) -cclib -lQt5Quick \
+	-cclib -lQt5Gui -cclib -lQt5Qml -cclib -lQt5Widgets -cclib -lQt5Network -cclib -lQt5Core
 OUT=qocamlbrowser
 GEN_CMX=DataItem.cmx AbstractModel.cmx Controller.cmx HistoryModel.cmx
 MOC_CPP=$(addprefix moc_,$(GEN_CMX:.cmx=_c.cpp) )
 GEN_CPP=$(GEN_CMX:.cmx=_c.o) $(MOC_CPP:.cpp=.o)
 GEN_MOC=$(GEN_CMX:.cmx=_c.cpp)
-OCAMLOPT=ocamlfind opt -package compiler-libs.common,unix,threads -linkpkg -thread -g
+OCAMLOPT=ocamlfind opt -package compiler-libs.common,unix,str,threads -linkpkg -thread -g
 
 CMX=helpers.cmx tree.cmx S.cmx Comb.cmx Richify.cmx HistoryZipper.cmx program.cmx
 
 .SUFFIXES: .qrc .cpp .h .o .ml .cmx .cmo .cmi
 .PHONY: all depend clean install uninstall
 
-all: $(GEN_CMX) $(CMX)  library_code $(GEN_MOC) $(GEN_CPP) resources.qrc qrc_resources.cpp qrc_resources.o main.o
-	$(CLINK) -L`ocamlc -where` -L`ocamlfind query lablqml` -L`ocamlfind query threads` \
-	 $(GEN_CPP) camlcode.o qrc_resources.o main.o \
-	-lthreads -lasmrun -llablqml_stubs `ocamlfind query lablqml`/lablqml.a \
-	-lunix -lcamlstr $(CLINKLIBS) $(NATIVECCLIBS) -lpthread -o $(OUT)
+all: $(GEN_CMX) $(CMX)  library_code $(GEN_MOC) $(GEN_CPP) resources.qrc qrc_resources.cpp qrc_resources.o 
+	$(OCAMLOPT) -package lablqml $(GEN_CPP) $(CLINKLIBS) $(GEN_CMX) $(CMX) qrc_resources.o -o $(OUT)
 
 depend:
 	ocamlfind dep *.ml *.ml > .depend
 
 library_code:
-	$(OCAMLOPT) -output-obj -dstartup -I `ocamlfind query lablqml` lablqml.cmxa str.cmxa \
+	$(OCAMLOPT) -output-obj -dstartup -I `ocamlfind query lablqml` lablqml.cmxa \
 	$(GEN_CMX) $(CMX) -linkall -o camlcode.o
 
 moc_%.cpp: %.h

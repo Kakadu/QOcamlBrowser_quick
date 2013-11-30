@@ -10,3 +10,18 @@ qocamlbrowser
 qrc_*.cpp
 # editor files
 *~
+
+# Generated files:
+AbstractModel_c.cpp
+AbstractModel_c.h
+AbstractModel.ml
+HistoryModel_c.cpp
+HistoryModel_c.h
+HistoryModel.ml
+DataItem_c.cpp
+DataItem_c.h
+DataItem.ml
+Controller_c.cpp
+Controller_c.h
+Controller.ml
+

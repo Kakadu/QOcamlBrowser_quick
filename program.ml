@@ -336,4 +336,6 @@ let main () =
   set_context_property ~ctx:(get_view_exn ~name:"rootContext") ~name:"myModel" model#handler;
   set_context_property ~ctx:(get_view_exn ~name:"rootContext") ~name:"controller" controller#handler
 
-let () = Callback.register "doCaml" main
+let () =
+  run_with_QQmlApplicationEngine Sys.argv main "Root.qml"
+
