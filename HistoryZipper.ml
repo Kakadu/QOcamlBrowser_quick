@@ -15,7 +15,7 @@ class virtual listModelHelper cppobj = object(self)
     (* TODO: add to generated code asserts about first <= last *)
     (* TODO: add to generated code labeled arguments *)
     assert (last>=first);
-    printf "beginRemoveRows(_,%d,%d)\n%!" first last;
+    (*printf "beginRemoveRows(_,%d,%d)\n%!" first last;*)
     super#beginRemoveRows index first last
 end
 
@@ -49,7 +49,7 @@ let make_model name =
       else if (role=0 || role=text_role)
       then (
         let ans = (List.nth !data ~n |> fst) in
-        printf "data: return %s on index=%d\n%!" ans n;
+        (*printf "data: return %s on index=%d\n%!" ans n;*)
         QVariant.of_string ans
       )
       else QVariant.empty
@@ -68,23 +68,19 @@ let make_model name =
       end
 
     method dropN n =
-      printf "self#dropN %d\n%!" n;
-      printf "old data: %s\n%!" (List.to_string ~f:fst !data);
+      (*printf "self#dropN %d\n%!" n;
+      printf "old data: %s\n%!" (List.to_string ~f:fst !data);*)
       assert (n>=0);
       if n <> 0 then begin
-		(* right piece of code 
         self#beginRemoveRows QModelIndex.empty 0 (n - 1);
-		*)
-		(* this is buggy one: see https://bugreports.qt-project.org/browse/QTBUG-33847 *)
-		self#beginRemoveRows QModelIndex.empty (List.length !data - n) (List.length !data - 1);
         data := List.drop !data ~n;
         self#endRemoveRows ()
-      end;
-      printf "new data: %s\n%!" (List.to_string ~f:(fst) !data)
+      end
+      (*printf "new data: %s\n%!" (List.to_string ~f:(fst) !data)*)
 
     (* should return reversed list *)
     method find ~f =
-      printf "zipper#find in %s\n%!" (List.to_string ~f:fst !data);
+      (*printf "zipper#find in %s\n%!" (List.to_string ~f:fst !data);*)
       try
         let _ = List.fold_left ~init:[] !data ~f:(fun acc x ->
           if f x then raise (ItemFound (acc,x))
@@ -117,7 +113,7 @@ let to_string z =
   sprintf "(%d,%s,%d)" z.backModel#count1 (fst z.cur) z.forwardModel#count1
 
 let find_back name ~zipper =
-  printf "Looking for '%s' in back history\n%!" name;
+  (*printf "Looking for '%s' in back history\n%!" name;*)
   match zipper.backModel#find ~f:(fun (x,_) -> x=name) with
   | None -> failwith "can't find history item backward"
   | Some (xs,newcur) ->

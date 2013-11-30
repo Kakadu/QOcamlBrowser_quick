@@ -9,6 +9,7 @@ ApplicationWindow {
     property string backgroundColor: "#FFFFDF"
 
     Keys.onEscapePressed: Qt.quit()
+/*
     menuBar: MenuBar {
         Menu {
             title: "File"
@@ -26,7 +27,7 @@ ApplicationWindow {
             MenuItem { text: "Copy" }
             MenuItem { text: "Paste" }
         }
-    }
+    } */
     ExclusiveGroup {
         Action {
             id: api_browsing_action
@@ -61,13 +62,11 @@ ApplicationWindow {
                         onTriggered: controller.backTo(model.text,-1);
                     }
                     onObjectAdded: {
-                        console.log("QML: object added: " + object.text + ", index= " + index);
                         backContextMenu.insertItem(index,object)
                         goBackAction.enabled = true;
                     }
                     onObjectRemoved: {
                         backContextMenu.removeItem(object)
-                        console.log("QML: object removed: " + object.text);
                         if (backContextMenu.items.count == 0) goBackAction.enabled = false
                     }
                 }
@@ -86,7 +85,6 @@ ApplicationWindow {
                     }
                     onObjectRemoved: {
                         forwardContextMenu.removeItem(object)
-                        console.log("QML: object removed: " + object.text);
                         if (forwardContextMenu.items.length==0) goForwardAction.enabled = false;
                     }
                 }

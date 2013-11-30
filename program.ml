@@ -104,7 +104,11 @@ let initial_cpp_data () : (abstractListModel * DataItem.base_DataItem list) list
     raise exc
 
 let make_full_path selected =
-  let indexes = if List.last selected = -1 then List.(selected |> rev |> tl |> rev) else selected in
+  let indexes =
+    if selected = [] then []
+    else if List.last selected = -1 then List.(selected |> rev |> tl |> rev)
+    else selected
+  in
   assert (List.for_all (fun  x -> x>=0 ) indexes);
   let proj = Tree.proj options.root indexes |> List.take ~n:(List.length indexes) in
   assert (List.length proj = List.length indexes);
@@ -275,7 +279,7 @@ let main () =
     method getDefaultLibraryPath () = Config.standard_library
 
     method forwardTo s i =
-      printf "OCaml: forward to '%s', %d\n%!" s i;
+      (*printf "OCaml: forward to '%s', %d\n%!" s i;*)
       HistoryZipper.find_forward ~zipper:options.zipper s;
       options.selected <- options.zipper.cur |> snd;
       update_view_lists model options.selected;
@@ -283,7 +287,7 @@ let main () =
       describe ()
 
     method backTo s i =
-      printf "OCaml: back to '%s', %d\n%!" s i;
+      (*printf "OCaml: back to '%s', %d\n%!" s i;*)
       HistoryZipper.find_back ~zipper:options.zipper s;
       options.selected <- options.zipper.cur |> snd;
       update_view_lists model options.selected;
