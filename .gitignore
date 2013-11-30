@@ -1,6 +1,6 @@
 .depend
 camlcode.o.startup.s
-*.cm[ixoa]
+*.cm[aiotx]
 *.o
 qocamlbrowser
 # C++

@@ -1,15 +1,17 @@
 MOC=`qmake -query QT_INSTALL_BINS`/moc
 RCC=`qmake -query QT_INSTALL_BINS`/rcc
-CC=g++ -g -fPIC -std=c++0x -DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG -DQT_QUICK_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_GUI_LIB -DQT_CORE_LIB `pkg-config --cflags Qt5Core Qt5Quick` -I`ocamlfind query lablqml` -I`ocamlc -where` \
-   -Dprotected=public -Dprivate=public
+#DO_QML_DEBUG=-DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG -DQT_QUICK_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+CC=g++ -g -fPIC -std=c++0x $(DO_QML_DEBUG) \
+	`pkg-config --cflags Qt5Core Qt5Widgets Qt5Quick` -I`ocamlfind query lablqml` -I`ocamlc -where` \
+	-Dprotected=public -Dprivate=public
 CLINK=g++ -g
-CLINKLIBS=`pkg-config --libs Qt5Quick`
+CLINKLIBS=`pkg-config --libs Qt5Quick Qt5Widgets`
 OUT=qocamlbrowser
 GEN_CMX=DataItem.cmx AbstractModel.cmx Controller.cmx HistoryModel.cmx
 MOC_CPP=$(addprefix moc_,$(GEN_CMX:.cmx=_c.cpp) )
 GEN_CPP=$(GEN_CMX:.cmx=_c.o) $(MOC_CPP:.cpp=.o)
 GEN_MOC=$(GEN_CMX:.cmx=_c.cpp)
-OCAMLOPT=ocamlfind opt -package compiler-libs.common,unix -linkpkg -g
+OCAMLOPT=ocamlfind opt -package compiler-libs.common,unix,threads -linkpkg -thread -g
 
 CMX=helpers.cmx tree.cmx S.cmx Comb.cmx Richify.cmx HistoryZipper.cmx program.cmx
 
@@ -17,10 +19,10 @@ CMX=helpers.cmx tree.cmx S.cmx Comb.cmx Richify.cmx HistoryZipper.cmx program.cm
 .PHONY: all depend clean install uninstall
 
 all: $(GEN_CMX) $(CMX)  library_code $(GEN_MOC) $(GEN_CPP) resources.qrc qrc_resources.cpp qrc_resources.o main.o
-	$(CLINK) -L`ocamlc -where` -L`ocamlfind query lablqml` \
+	$(CLINK) -L`ocamlc -where` -L`ocamlfind query lablqml` -L`ocamlfind query threads` \
 	 $(GEN_CPP) camlcode.o qrc_resources.o main.o \
-	-lasmrun -llablqml_stubs `ocamlfind query lablqml`/lablqml.a \
-	-lunix -lcamlstr $(CLINKLIBS) $(NATIVECCLIBS)  -o $(OUT)
+	-lthreads -lasmrun -llablqml_stubs `ocamlfind query lablqml`/lablqml.a \
+	-lunix -lcamlstr $(CLINKLIBS) $(NATIVECCLIBS) -lpthread -o $(OUT)
 
 depend:
 	ocamlfind dep *.ml *.ml > .depend
@@ -43,7 +45,7 @@ qrc_%.cpp: %.qrc $(QMLS)
 	$(OCAMLOPT) -I `ocamlfind query lablqml` -c $<
 
 clean:
-	rm *.o *.cm[oiax] *.cmxa *.o.startup.s $(MOC_CPP) qrc_resources.* -f
+	rm *.o *.cm[oiatx] *.cmxa *.o.startup.s $(MOC_CPP) qrc_resources.* -f
 
 install:
 	cp $(OUT) $(PREFIX)/bin
