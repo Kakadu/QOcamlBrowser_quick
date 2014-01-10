@@ -1,4 +1,5 @@
 .depend
+_build
 camlcode.o.startup.s
 *.cm[aiotx]
 *.o
@@ -10,6 +11,7 @@ qocamlbrowser
 qrc_*.cpp
 # editor files
 *~
+*.swp
 
 # Generated files:
 AbstractModel_c.cpp

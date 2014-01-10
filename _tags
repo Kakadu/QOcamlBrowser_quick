@@ -1,0 +1,6 @@
+#<*.ml*>: 
+true: package(lablqml)
+true: verbose, thread, package(compiler-libs.common), package(unix), package(str)
+<program.native>: use_qt5
+
+
