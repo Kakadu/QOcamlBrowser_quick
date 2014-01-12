@@ -5,5 +5,8 @@ ocamlbuild -use-ocamlfind \
 # exit 0
 
 ocamlbuild -use-ocamlfind \
+    src/qrc_resources.c
+
+ocamlbuild -use-ocamlfind \
     src/libcppstubs.a \
     src/program.native -verbose 1

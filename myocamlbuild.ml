@@ -30,15 +30,14 @@ let pkg_config_lib ~lib (*~has_lib ~stublib *) =
   let stublib_flags = List.map (make_opt "-dllib") stub_l  in *)
   let tag = Printf.sprintf "use_%s" lib in
   flag ["c"; "ocamlmklib"; "use_qt5"] (S mklib_flags);
-  flag ["c"; "compile"; "mocml_generated"] (S compile_flags);
-  flag ["c"; "compile"; "mocml_generated"] (S [A"-cc";A"g++"; A"-ccopt";A"-std=c++0x";A"-ccopt";A"-fPIC"]);
-  flag ["c"; "compile"; "mocml_generated"] (S [A"-ccopt";A"-Dprotected=public"]);
-  flag ["c"; "compile"; "mocml_generated"] (S [A"-package";A"lablqml"]);
 
-  flag ["c"; "compile"; "qtmoc_generated"] (S compile_flags);
-  flag ["c"; "compile"; "qtmoc_generated"] (S [A"-cc";A"g++"; A"-ccopt";A"-std=c++0x";A"-ccopt";A"-fPIC"]);
-  flag ["c"; "compile"; "qtmoc_generated"] (S [A"-ccopt";A"-Dprotected=public"]);
-  flag ["c"; "compile"; "qtmoc_generated"] (S [A"-ccopt";A"-I.";A"-package";A"lablqml"]);
+  List.iter (fun tag ->
+    flag ["c"; "compile"; tag] (S compile_flags);
+    flag ["c"; "compile"; tag] (S [A"-cc";A"g++"; A"-ccopt";A"-std=c++0x";A"-ccopt";A"-fPIC"]);
+    flag ["c"; "compile"; tag] (S [A"-ccopt";A"-Dprotected=public"]);
+    flag ["c"; "compile"; tag] (S [A"-package";A"lablqml"]);
+    flag ["c"; "compile"; tag] (S [A"-ccopt";A"-I."]);
+  ) ["mocml_generated"; "qtmoc_generated"; "qt_resource_file"];
 
   flag ["link"; "ocaml"; "use_qt5"] (S (link_flags @ lib_flags));
   flag ["link"; "ocaml"; "use_qt5"] (make_opt "-cclib" (A"-lstdc++"));
@@ -51,14 +50,22 @@ let () =
       ~prods:["%(path:<**/>)moc_%(modname:<*>).c"]
       ~dep:"%(path)%(modname).h"
       (begin fun env build ->
-        tag_file (env "%(path)%(modname).h") ["qtmoc"]; (*
-        dep ["compile"; "c"] [ "%(path)%(modname).h" ]; *)
+        tag_file (env "%(path)%(modname).h") ["qtmoc"];
         Cmd (S [A "moc"; P (env "%(path)%(modname).h"); Sh ">"; P (env "%(path)moc_%(modname).c")]);
+       end);
+
+    rule "Qt resource: %.qrc -> qrc_%.c"
+      ~prods:["%(path:<**/>)qrc_%(modname:<*>).c"]
+      ~dep:"%(path)%(modname).qrc"
+      (begin fun env build -> (*
+        tag_file (env "%(path)%(modname).h") ["qt_resource"]; *)
+        Cmd(S[ A"rcc"; A"-name"; A(env "%(modname)"); P (env "%(path)%(modname).qrc")
+             ; A "-o"; P (env "%(path)qrc_%(modname).c")])
        end);
 
     pkg_config_lib ~lib:"Qt5Quick Qt5Widgets"; (*
     pkg_config_lib ~lib:"Qt5Widgets"; *)
-
+    dep ["link"; "ocaml"; "use_qrc_stub"] ["src/qrc_resources.o"];
     flag ["link"; "ocaml"; "native"; "use_cppstubs" ] (S[A"src/libcppstubs.a"]);
     dep ["compile"; "c"] [ "src/DataItem_c.h"
                          ; "src/Controller_c.h"

@@ -1,7 +1,6 @@
-#<*.ml*>:
 <src/*.ml*>: package(lablqml), verbose
 <src/*.ml*>: verbose, thread, package(compiler-libs.common), package(str)
-<src/program.native>: use_qt5, package(compiler-libs.common), package(str), package(unix), package(lablqml), use_cppstubs
+<src/program.native>: use_qt5, package(compiler-libs.common), package(str), package(unix), package(lablqml), use_cppstubs, use_qrc_stub
 
 <src/DataItem_c.c>:      mocml_generated
 <src/Controller_c.c>:    mocml_generated
@@ -17,3 +16,6 @@
 <src/AbstractModel_c.h>: qtmoc
 <src/HistoryModel_c.h>:  qtmoc
 <src/DataItem_c.h>:      qtmoc
+
+<src/resources.qrc>:     qt_resource_file
+<src/qrc_resources.c>:   qt_resource_file
