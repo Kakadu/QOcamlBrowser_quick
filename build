@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-ocamlbuild -use-ocamlfind  src/DataItem_c.h -verbose 1
-exit 0
-ocamlbuild -use-ocamlfind  src/libcppstubs.a
-ocamlbuild -use-ocamlfind  src/program.native
+set -x
+ocamlbuild -use-ocamlfind \
+    src/moc_DataItem_c.c src/moc_Controller_c.c src/moc_AbstractModel_c.c src/moc_HistoryModel_c.c
+# exit 0
+
+ocamlbuild -use-ocamlfind \
+    src/libcppstubs.a \
+    src/program.native -verbose 1

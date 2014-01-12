@@ -29,62 +29,41 @@ let pkg_config_lib ~lib (*~has_lib ~stublib *) =
   let link_flags = List.map (make_opt "-ccopt") (linker @ libs_L) in (*
   let stublib_flags = List.map (make_opt "-dllib") stub_l  in *)
   let tag = Printf.sprintf "use_%s" lib in
-  flag ["c"; "ocamlmklib"; tag] (S mklib_flags);
+  flag ["c"; "ocamlmklib"; "use_qt5"] (S mklib_flags);
   flag ["c"; "compile"; "mocml_generated"] (S compile_flags);
   flag ["c"; "compile"; "mocml_generated"] (S [A"-cc";A"g++"; A"-ccopt";A"-std=c++0x";A"-ccopt";A"-fPIC"]);
   flag ["c"; "compile"; "mocml_generated"] (S [A"-ccopt";A"-Dprotected=public"]);
-  flag ["link"; "ocaml"; tag] (S (link_flags @ lib_flags));
-  flag ["link"; "ocaml"; tag] (make_opt "-cclib" (A"-lstdc++"));
-  (*
-  flag ["link"; "ocaml"; "library"; "byte"; tag] (S stublib_flags) *)
+  flag ["c"; "compile"; "mocml_generated"] (S [A"-package";A"lablqml"]);
+
+  flag ["c"; "compile"; "qtmoc_generated"] (S compile_flags);
+  flag ["c"; "compile"; "qtmoc_generated"] (S [A"-cc";A"g++"; A"-ccopt";A"-std=c++0x";A"-ccopt";A"-fPIC"]);
+  flag ["c"; "compile"; "qtmoc_generated"] (S [A"-ccopt";A"-Dprotected=public"]);
+  flag ["c"; "compile"; "qtmoc_generated"] (S [A"-ccopt";A"-I.";A"-package";A"lablqml"]);
+
+  flag ["link"; "ocaml"; "use_qt5"] (S (link_flags @ lib_flags));
+  flag ["link"; "ocaml"; "use_qt5"] (make_opt "-cclib" (A"-lstdc++"));
   ()
 
 let () =
   dispatch begin function
-  | Before_rules ->
-    (*
-    rule  "compile C++ files rule"
-         ~prod:"%.o"
-         ~deps:"src/DataItem_c.o"
-         begin fun env build ->
-           let a = env _a in
-           let tags = tags_of_pathname a++"library"++"object"++"archive" in
-           Cmd(S([ A"g++"; A"-o"; A libname ]
-                 @ (List.map (fun o -> A o) c_objs) @
-                 [  A(l_ zlib_libdir); A zlib_lib; T tags ]
-                )
-              )
-         end; *)
-    flag  [ "cpp"; "compile"; ] (S [A"-package";A"lablqml"]);
-    ()
   | After_rules ->
     rule "Qt_moc: %.h -> moc_%.c"
       ~prods:["%(path:<**/>)moc_%(modname:<*>).c"]
       ~dep:"%(path)%(modname).h"
       (begin fun env build ->
-        tag_file (env "%(path)%(modname).h") ["qtmoc"];
+        tag_file (env "%(path)%(modname).h") ["qtmoc"]; (*
+        dep ["compile"; "c"] [ "%(path)%(modname).h" ]; *)
         Cmd (S [A "moc"; P (env "%(path)%(modname).h"); Sh ">"; P (env "%(path)moc_%(modname).c")]);
        end);
-    (*
-    tag_file "src/DataItem_c.h" ["qtmoc"];
-    *)
-    pkg_config_lib ~lib:"Qt5Quick";
-    pkg_config_lib ~lib:"Qt5Widgets";
+
+    pkg_config_lib ~lib:"Qt5Quick Qt5Widgets"; (*
+    pkg_config_lib ~lib:"Qt5Widgets"; *)
+
     flag ["link"; "ocaml"; "native"; "use_cppstubs" ] (S[A"src/libcppstubs.a"]);
-    flag ["compile"; "c"; "mocml_generated"] (S [A"-package";A"lablqml"]);
     dep ["compile"; "c"] [ "src/DataItem_c.h"
                          ; "src/Controller_c.h"
+                         ; "src/HistoryModel_c.h"
                          ; "src/AbstractModel_c.h"];
-    (*
-    flag ["link"; "ocaml"; "native"; "use_qt5"]
-          (S[A"-cclib"; A"-lQt5Quick"
-            ;A"-cclib"; A"-lQt5Gui"
-            ;A"-cclib"; A"-lQt5Widgets"
-            ;A"-cclib"; A"-lQt5Network"
-            ;A"-cclib"; A"-lQt5Core"
-            ;A"-cclib"; A"-lQt5Qml"
-            ;A"-cclib"; A"-lstdc++"]
-                                                                ) *)
     ()
   | _ -> ()
   end

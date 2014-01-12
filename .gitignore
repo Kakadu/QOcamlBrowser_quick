@@ -4,6 +4,8 @@ camlcode.o.startup.s
 *.cm[aiotx]
 *.o
 qocamlbrowser
+*.native
+*.byte
 # C++
 .moc
 .pch
