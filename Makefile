@@ -19,7 +19,7 @@ CMX=helpers.cmx tree.cmx S.cmx Comb.cmx Richify.cmx HistoryZipper.cmx program.cm
 .SUFFIXES: .qrc .cpp .h .o .ml .cmx .cmo .cmi
 .PHONY: all depend clean install uninstall
 
-all: $(GEN_CMX) $(CMX)  library_code $(GEN_MOC) $(GEN_CPP) resources.qrc qrc_resources.cpp qrc_resources.o 
+all: $(GEN_CMX) $(CMX)  library_code $(GEN_MOC) $(GEN_CPP) resources.qrc qrc_resources.cpp qrc_resources.o
 	$(OCAMLOPT) -package lablqml $(GEN_CPP) $(CLINKLIBS) $(GEN_CMX) $(CMX) qrc_resources.o -o $(OUT)
 
 depend:
@@ -43,7 +43,7 @@ qrc_%.cpp: %.qrc $(QMLS)
 	$(OCAMLOPT) -I `ocamlfind query lablqml` -c $<
 
 clean:
-	rm *.o *.cm[oiatx] *.cmxa *.o.startup.s $(MOC_CPP) qrc_resources.* -f
+	rm *.o *.cm[oiatx] *.cmxa *.o.startup.s $(MOC_CPP) qrc_resources.* -fr _build
 
 install:
 	cp $(OUT) $(PREFIX)/bin

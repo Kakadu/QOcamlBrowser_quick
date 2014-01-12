@@ -1,6 +1,8 @@
-#<*.ml*>: 
-true: package(lablqml)
-true: verbose, thread, package(compiler-libs.common), package(unix), package(str)
-<program.native>: use_qt5
-
-
+#<*.ml*>:
+<src/*.ml*>: package(lablqml), verbose
+<src/*.ml*>: verbose, thread, package(compiler-libs.common), package(str)
+<src/program.native>: use_Qt5Quick, package(compiler-libs.common), package(str), package(unix), package(lablqml), use_cppstubs
+<src/DataItem_c.c>: mocml_generated
+<src/Controller_c.c>: mocml_generated
+<src/AbstractModel_c.c>: mocml_generated
+<src/DataItem_c.h>: qtmoc

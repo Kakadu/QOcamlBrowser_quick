@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
-ocamlbuild -use-ocamlfind program.native
-
+ocamlbuild -use-ocamlfind  src/DataItem_c.h -verbose 1
+exit 0
+ocamlbuild -use-ocamlfind  src/libcppstubs.a
+ocamlbuild -use-ocamlfind  src/program.native
