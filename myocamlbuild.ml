@@ -59,11 +59,11 @@ let () =
     ()
   | After_rules ->
     rule "Qt_moc: %.h -> moc_%.c"
-      ~prods:["moc_%.c"]
-      ~dep:"%.h"
+      ~prods:["%(path:<**/>)moc_%(modname:<*>).c"]
+      ~dep:"%(path)%(modname).h"
       (begin fun env build ->
-        tag_file (env "%.h") ["qtmoc"];
-        Cmd (S [A "moc"; P (env "%.h"); Sh ">"; P (env "moc_%.c")]);
+        tag_file (env "%(path)%(modname).h") ["qtmoc"];
+        Cmd (S [A "moc"; P (env "%(path)%(modname).h"); Sh ">"; P (env "%(path)moc_%(modname).c")]);
        end);
     (*
     tag_file "src/DataItem_c.h" ["qtmoc"];
