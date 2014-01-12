@@ -1,0 +1,7 @@
+src/moc_DataItem_c.c
+src/moc_Controller_c.c
+src/moc_AbstractModel_c.c
+src/moc_HistoryModel_c.c
+src/qrc_resources.c
+src/libcppstubs.a
+src/program.native
