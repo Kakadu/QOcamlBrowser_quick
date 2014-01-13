@@ -19,3 +19,4 @@
 
 <src/resources.qrc>:     qt_resource_file
 <src/qrc_resources.c>:   qt_resource_file
+

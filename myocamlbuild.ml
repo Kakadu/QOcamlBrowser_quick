@@ -57,17 +57,15 @@ let () =
 
     rule "Qt resource: %.qrc -> qrc_%.c"
       ~prods:["%(path:<**/>)qrc_%(modname:<*>).c"]
-      ~deps:["%(path)%(modname).qrc" (*; "%(path)../ui/Root.qml" *)]
-      (begin fun env _ -> (*
+      ~deps:["%(path)%(modname).qrc" ; "Root.qml"  ]
+      (begin fun env _ -> 
+        (*
         tag_file (env "%(path)%(modname).h") ["qt_resource"]; *)
         Cmd(S[ A"rcc"; A"-name"; A(env "%(modname)"); P (env "%(path)%(modname).qrc")
              ; A "-o"; P (env "%(path)qrc_%(modname).c")])
        end);
 
-    pkg_config_lib ~lib:"Qt5Quick Qt5Widgets"; (*
-    dep ["compile"; "use_qrc_stub"]   ["ui/Root.qml"]; *)
-
-    dep ["file:src/resoures.qrc"] ["Root.qml"];
+    pkg_config_lib ~lib:"Qt5Quick Qt5Widgets";  
 
     dep ["link"; "ocaml"; "use_qrc_stub"] ["src/qrc_resources.o"];
     flag ["link"; "ocaml"; "native"; "use_cppstubs" ] (S[A"src/libcppstubs.a"]);
