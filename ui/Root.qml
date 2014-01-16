@@ -10,7 +10,7 @@ ApplicationWindow {
 
     Keys.onEscapePressed: Qt.quit()
 /*
-    menuBar: MenuBar {
+      menuBar: MenuBar {
         Menu {
             title: "File"
             //MenuItem { text: "Open..." }
@@ -19,9 +19,9 @@ ApplicationWindow {
                 shortcut: "Ctrl-Q"
                 onTriggered: { Qt.quit() }
             }
-        }
+         }
 
-        Menu {
+            Menu {
             title: "Edit"
             MenuItem { text: "Cut" }
             MenuItem { text: "Copy" }

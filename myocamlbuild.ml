@@ -1,7 +1,9 @@
 open Ocamlbuild_plugin
 open Command
 
-(* Generic pkg-config(1) support. *)
+(* Generic pkg-config(1) support. 
+ * Adopted from tsdl's myocamlbuild.ml 
+ *)
 
 let os = Ocamlbuild_pack.My_unix.run_and_read "uname -s"
 
@@ -43,6 +45,13 @@ let pkg_config_lib ~lib (*~has_lib ~stublib *) =
   flag ["link"; "ocaml"; "use_qt5"] (make_opt "-cclib" (A"-lstdc++"));
   ()
 
+let resource_depends = 
+  [ "ui/ApiBrowser.qml"; "ui/main.js";"ui/PathEditor.qml";"ui/Root.qml";"ui/Scrollable.qml"
+  ; "ui/ScrollBar.qml"
+  (* pictures *)
+  ; "ui/pics/minus-sign.png"; "ui/pics/plus-sign.png" 
+  ]
+
 let () =
   dispatch begin function
   | After_rules ->
@@ -57,7 +66,7 @@ let () =
 
     rule "Qt resource: %.qrc -> qrc_%.c"
       ~prods:["%(path:<**/>)qrc_%(modname:<*>).c"]
-      ~deps:["%(path)%(modname).qrc" ; "Root.qml"  ]
+      ~deps:("%(path)%(modname).qrc" :: resource_depends)
       (begin fun env _ -> 
         (*
         tag_file (env "%(path)%(modname).h") ["qt_resource"]; *)

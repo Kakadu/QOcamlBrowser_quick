@@ -107,7 +107,7 @@ Rectangle {
                             anchors.right: parent.right
                             anchors.rightMargin: 10
                             visible: false
-                            source: "qrc:/pics/plus-sign.png"
+                            source: "qrc:/ui/pics/plus-sign.png"
                             MouseArea {
                                 anchors.fill: parent
                                 propagateComposedEvents: true
@@ -133,7 +133,7 @@ Rectangle {
 
                     Image {
                         anchors.left: parent.left
-                        source: "pics/minus-sign.png"
+                        source: "qrc:/ui/pics/minus-sign.png"
                         id: deleteButton
                         MouseArea {
                             anchors.fill: parent
