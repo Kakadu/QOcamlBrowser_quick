@@ -2,7 +2,6 @@ open ListLabels
 open Printf
 
 let (^/) a b = sprintf "%s/%s" a b
-external (|>) : 'a -> ('a -> 'b) -> 'b = "%revapply"
 
 module List = struct
   include ListLabels
