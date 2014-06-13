@@ -39,7 +39,7 @@ let read_modules dirs : Types.signature_item list =
       |> List.filter ~f:(fun s -> Filename.check_suffix s ".cmi")
       |> List.map ~f:(fun name -> (path,name))
     ) |> List.flatten in
-  List.map (fun (path,filename) ->
+  List.map ~f:(fun (path,filename) ->
     let module_name = modulename_of_file (Filename.chop_extension filename) in
     let sign = process_cmi_file (path ^/ filename) in
     Types_helpers.make_mod_struct ~name:module_name sign

@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
 
-#MOCML=mocml
-MOCML=../lablqt/src/mocml.native
+MOCML=ppx_qt
 #set -x
 hash $MOCML 2>/dev/null || { echo >&2 "I require mocml but it's not installed.  Aborting."; exit 1; }
 echo "Executing generator"
-$MOCML input.json -ext c -destdir src #-with-debug
-$MOCML input.json -list
+#$MOCML input.json -ext c -destdir src #-with-debug\
+for i in "Controller.ml" "AbstractModel.ml" "HistoryModel.ml" "DataItem.ml"
+do
+  ocamlfind c -package lablqml -dsource -ppx "ppx_qt -destdir src" -c src/$i
+  if [ $? != 0 ]; then
+    echo "Some error"
+    exit 1
+  fi
+done
+
+rm -f src/*.cm[oi]
+
+#$MOCML input.json -list
 #echo ""> .depend
 #make depend
 

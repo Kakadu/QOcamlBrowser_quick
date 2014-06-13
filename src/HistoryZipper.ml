@@ -4,7 +4,7 @@ open Printf
 open QmlContext
 
 class virtual listModelHelper cppobj = object(self)
-  inherit base_HistoryModel cppobj as super
+  inherit historyModel cppobj as super
   method parent _ = QModelIndex.empty
   method index row column parent =
     if (row>=0 && row<self#rowCount parent) then QModelIndex.make ~row ~column:0
@@ -36,7 +36,7 @@ type zipper = {
 }
 
 let make_model name =
-  let cppobj = HistoryModel.create_HistoryModel () in
+  let cppobj = HistoryModel.create_historyModel () in
   let text_role = 690 in
   HistoryModel.add_role cppobj text_role "text";
   let data : item list ref = ref [] in
@@ -44,6 +44,7 @@ let make_model name =
     inherit listModelHelper cppobj
     method rowCount _ = List.length !data
     method data index role =
+      let (_:int) = role in
       let n = QModelIndex.row index in
       if (n<0 || n>= List.length !data) then QVariant.empty
       else if (role=0 || role=text_role)
@@ -58,13 +59,13 @@ let make_model name =
       if xs<>[] then begin
         self#beginInsertRows QModelIndex.empty 0 (List.length xs - 1);
         data := xs @ !data;
-        self#endInsertRows ()
+        self#endInsertRows
       end
     method clear =
       if !data <> [] then begin
         self#beginRemoveRows QModelIndex.empty 0 (List.length !data - 1);
         data := [];
-        self#endRemoveRows ()
+        self#endRemoveRows
       end
 
     method dropN n =
@@ -74,7 +75,7 @@ let make_model name =
       if n <> 0 then begin
         self#beginRemoveRows QModelIndex.empty 0 (n - 1);
         data := List.drop !data ~n;
-        self#endRemoveRows ()
+        self#endRemoveRows
       end
       (*printf "new data: %s\n%!" (List.to_string ~f:(fst) !data)*)
 

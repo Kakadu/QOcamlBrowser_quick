@@ -1,21 +1,27 @@
-<src/*.ml*>: package(lablqml), verbose
-<src/*.ml*>: verbose, thread, package(compiler-libs.common), package(str)
-<src/program.native>: use_qt5, package(compiler-libs.common), package(str), package(unix), package(lablqml), use_cppstubs, use_qrc_stub
+true: debug, warn(@6)
+<src/*.ml*>: package(lablqml)
+<src/*.ml*>: thread, package(compiler-libs.common), package(str)
+<src/program.native>: use_qt5, package(compiler-libs.common), package(str), package(unix), package(lablqml), use_cppstubs,use_qrc_stub, thread
 
-<src/DataItem_c.c>:      mocml_generated
-<src/Controller_c.c>:    mocml_generated
-<src/AbstractModel_c.c>: mocml_generated
-<src/HistoryModel_c.c>:  mocml_generated
+<src/DataItem.ml>: use_ppx_qt
+<src/Controller.ml>: use_ppx_qt
+<src/HistoryModel.ml>: use_ppx_qt
+<src/AbstractModel.ml>: use_ppx_qt
 
-<src/moc_DataItem_c.c>:      qtmoc_generated
-<src/moc_Controller_c.c>:    qtmoc_generated
-<src/moc_AbstractModel_c.c>: qtmoc_generated
-<src/moc_HistoryModel_c.c>:  qtmoc_generated
+<src/dataItem_c.c>:      mocml_generated
+<src/controller_c.c>:    mocml_generated
+<src/abstractModel_c.c>: mocml_generated
+<src/historyModel_c.c>:  mocml_generated
 
-<src/Controller_c.h>:    qtmoc
-<src/AbstractModel_c.h>: qtmoc
-<src/HistoryModel_c.h>:  qtmoc
-<src/DataItem_c.h>:      qtmoc
+#<src/dataItem.h>:      qtmoc
+#<src/controller.h>:    qtmoc
+#<src/abstractModel.h>: qtmoc
+#<src/historyModel.h>:  qtmoc
+
+<src/moc_dataItem.c>:      qtmoc_generated
+<src/moc_controller.c>:    qtmoc_generated
+<src/moc_abstractModel.c>: qtmoc_generated
+<src/moc_historyModel.c>:  qtmoc_generated
 
 <src/resources.qrc>:     qt_resource_file
 <src/qrc_resources.c>:   qt_resource_file

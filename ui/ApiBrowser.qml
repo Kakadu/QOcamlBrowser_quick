@@ -40,7 +40,7 @@ SplitView {
                 contentItem: ListView {
                     id: lv1
                     anchors.fill: parent
-                    currentIndex: model.hardcodedSelectedIndex
+                    currentIndex: model.hardcodedIndex
 
                     highlight: Rectangle {
                         color: backgroundColor
@@ -62,7 +62,7 @@ SplitView {
                         height: defaultTextFieldHeight
                         width: lv1.width - 15
                         x: 5
-                        text: qwe.name() + " (" + qwe.sort() + ")"
+                        text: qwe.name + " (" + qwe.sort + ")"
                         font.family: "Consolas"
                         font.pixelSize: defaultFontSize
                         MouseArea {

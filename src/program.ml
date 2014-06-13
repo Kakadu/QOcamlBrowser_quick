@@ -7,7 +7,7 @@ open QmlContext
 let () = Printexc.record_backtrace true
 
 class virtual abstractListModel cppobj = object(self)
-  inherit AbstractModel.base_AbstractModel cppobj as super
+  inherit AbstractModel.abstractModel cppobj as super
   method parent _ = QModelIndex.empty
   method index row column parent =
     if (row>=0 && row<self#rowCount parent) then QModelIndex.make ~row ~column:0
@@ -15,14 +15,14 @@ class virtual abstractListModel cppobj = object(self)
   method columnCount _ = 1
   method hasChildren _ = self#rowCount QModelIndex.empty > 0
   val mutable curIndex = -1
-  method getHardcodedIndex () = curIndex
+  method gethardcodedIndex () = curIndex
   method setHardCodedIndex v =
     if v <> curIndex then (curIndex <- v;
                            self#emit_hardcodedIndexChanged v)
 end
 
 class type virtual controller_t = object
-  inherit Controller.base_Controller
+  inherit Controller.controller
   method updateDescription: string -> unit
   method emit_fullPath: unit -> unit
 end
@@ -31,7 +31,7 @@ type options = {
   mutable path: string list;
   mutable zipper: HistoryZipper.zipper;
   mutable root: Types.signature_item Tree.tree;
-  mutable cpp_data: (abstractListModel * DataItem.base_DataItem list) list;
+  mutable cpp_data: (abstractListModel * DataItem.dataItem list) list;
   mutable controller: controller_t;
   (* indexes for selected menu*)
   mutable selected: int list;
@@ -63,14 +63,14 @@ let update_paths xs =
 let cpp_data_helper (ys: Types.signature_item Tree.tree list list) =
   let f xs =
     let data = List.map xs ~f:(fun {Tree.name;Tree.internal;_} ->
-      let cppObj = DataItem.create_DataItem () in
+      let cppObj = DataItem.create_dataItem () in
       object(self)
-        inherit DataItem.base_DataItem cppObj as super
-        method name () = name
-        method sort () = internal |> S.sort_of_sig_item
+        inherit DataItem.dataItem cppObj as super
+        method getname () = name
+        method getsort () = internal |> S.sort_of_sig_item
       end) in
     (* creating miniModel for this list *)
-    let cppobj = AbstractModel.create_AbstractModel () in
+    let cppobj = AbstractModel.create_abstractModel () in
     let innerModelMyRole = 556 in
     AbstractModel.add_role cppobj innerModelMyRole "qwe";
 
@@ -93,7 +93,7 @@ let cpp_data_helper (ys: Types.signature_item Tree.tree list list) =
   in
   List.map ys ~f
 
-let initial_cpp_data () : (abstractListModel * DataItem.base_DataItem list) list =
+let initial_cpp_data () : (abstractListModel * DataItem.dataItem list) list =
   try
     let xs = Tree.proj options.root [] in
     assert (List.length xs = 1);
@@ -109,7 +109,7 @@ let make_full_path selected =
     else if List.last selected = -1 then List.(selected |> rev |> tl |> rev)
     else selected
   in
-  assert (List.for_all (fun  x -> x>=0 ) indexes);
+  assert (List.for_all ~f:(fun x -> x>=0 ) indexes);
   let proj = Tree.proj options.root indexes |> List.take ~n:(List.length indexes) in
   assert (List.length proj = List.length indexes);
   List.map2 proj indexes ~f:(fun xs n -> let x = List.nth xs ~n in x.Tree.name) |> String.concat "."
@@ -138,7 +138,7 @@ let item_selected mainModel x y : unit =
   if redraw_from <= last_row then begin
     mainModel#beginRemoveRows QModelIndex.empty redraw_from (List.length options.cpp_data-1);
     options.cpp_data <- cpp_data_head;
-    mainModel#endRemoveRows ();
+    mainModel#endRemoveRows;
   end else begin
     options.cpp_data <- cpp_data_head;
   end;
@@ -146,7 +146,7 @@ let item_selected mainModel x y : unit =
   let xs = Tree.proj options.root new_selected in
   assert (List.length xs = List.length new_selected);
   if leaf_selected then begin
-    HistoryZipper.set_current (make_full_path new_selected, new_selected) options.zipper;
+    HistoryZipper.set_current (make_full_path new_selected, new_selected) ~zipper:options.zipper;
     options.selected <- new_selected;
     describe ()
   end else begin
@@ -157,7 +157,7 @@ let item_selected mainModel x y : unit =
       let last = from + List.length zs-1 in
       mainModel#beginInsertRows QModelIndex.empty from last;
       options.cpp_data <- options.cpp_data @ zs;
-      mainModel#endInsertRows ();
+      mainModel#endInsertRows;
     end;
   end;
   assert (List.length options.cpp_data = List.length new_selected)
@@ -168,12 +168,12 @@ let update_view_lists mainModel xs =
   (* *)
   mainModel#beginRemoveRows QModelIndex.empty 0 (List.length options.cpp_data - 1);
   options.cpp_data <- [];
-  mainModel#endRemoveRows ();
+  mainModel#endRemoveRows ;
   (* TODO: rewrite generating of functions for listmodel with labels *)
   mainModel#beginInsertRows QModelIndex.empty 0 (List.length xs - 1);
   options.selected <- xs;
   options.cpp_data <- cpp_data_helper models;
-  mainModel#endInsertRows ();
+  mainModel#endInsertRows;
   List.iter2 options.cpp_data options.selected ~f:(fun (m,_) v -> m#setHardCodedIndex v)
 
 exception LinkFound of int list
@@ -242,20 +242,20 @@ let do_update_paths model xs =
     (* there we need to clear model ... *)
     model#beginRemoveRows QModelIndex.empty 0 (List.length options.cpp_data-1);
     options.cpp_data <- [];
-    model#endRemoveRows ();
+    model#endRemoveRows;
     options.root <- update_paths xs;
     (* ... and repopuly it *)
     if options.root.Tree.sons <> [] then begin
       model#beginInsertRows QModelIndex.empty 0 0;
       options.cpp_data <- initial_cpp_data ();
       options.selected <- [-1];
-      model#endInsertRows ()
+      model#endInsertRows
     end else
       options.selected <- [];
   end
 
 let main () =
-  let cpp_model = AbstractModel.create_AbstractModel () in
+  let cpp_model = AbstractModel.create_abstractModel () in
   let myDefaultRoleMainModel = 555 in
   AbstractModel.add_role cpp_model myDefaultRoleMainModel "homm";
 
@@ -272,9 +272,9 @@ let main () =
       end
   end in
 
-  let controller_cppobj = Controller.create_Controller () in
+  let controller_cppobj = Controller.create_controller () in
   let controller = object(self)
-    inherit Controller.base_Controller controller_cppobj as super
+    inherit Controller.controller controller_cppobj as super
 
     method getDefaultLibraryPath () = Config.standard_library
 
@@ -302,31 +302,34 @@ let main () =
         Printexc.to_string exc |> print_endline;
         printf "Backtrace:\n%s\n%!" (Printexc.get_backtrace ());
         exit 0
-    method paths () = options.path
+    method paths () = 
+	printf "OCaml: calling methods 'paths'\n";
+	options.path
     method setPaths xs =
       do_update_paths model xs;
       self#updateDescription "";
       self#emit_fullPath ()
 
     val mutable desc = None
-    method isHasData () = match desc with Some _ -> true | _ -> false
-    method getDescr () =
+    method gethasData () = match desc with Some _ -> true | _ -> false
+    method getdescr () =
       match desc with
         | Some x -> x
         | None   ->
             eprintf "App have tried to access description which should not exist now";
             "<no description. Bug!>"
+
     method emit_fullPath () =
-      self#emit_fullPathChanged (self#fullPath ())
-    method fullPath () = make_full_path options.selected
+      self#emit_fullPathChanged (self#getfullPath ())
+    method getfullPath () = make_full_path options.selected
     method updateDescription info =
-      if self#isHasData () then begin
+      if self#gethasData () then begin
         desc <- Some info;
       end else begin
         desc <- Some info;
         self#emit_hasDataChanged true;
       end;
-      self#emit_descChanged info
+      self#emit_descrChanged info
   end in
 
   options.root <- update_paths options.path;

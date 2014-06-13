@@ -8,7 +8,7 @@ ApplicationWindow {
     property int defaultTextFieldHeight: defaultFontSize + 4
     property string backgroundColor: "#FFFFDF"
 
-    Keys.onEscapePressed: Qt.quit()
+    //Keys.onEscapePressed: Qt.quit()
 /*
       menuBar: MenuBar {
         Menu {
@@ -145,8 +145,9 @@ ApplicationWindow {
         function setCurrentPaths() {
             // get OCaml paths and set them to temporary model
             var lst = controller.paths() // So hackful because we need to convert QList<String> to Array
+	    console.log("got paths from OCaml");
             var ans = [];
-            for (var x in lst ) ans.push(lst[x])
+            for (var x in lst ) { ans.push(lst[x]); console.log(lst[x]) }
             editPathsContainer.pathModel = ans
         }
         function applyPaths() {
