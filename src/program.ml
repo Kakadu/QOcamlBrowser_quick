@@ -302,9 +302,7 @@ let main () =
         Printexc.to_string exc |> print_endline;
         printf "Backtrace:\n%s\n%!" (Printexc.get_backtrace ());
         exit 0
-    method paths () = 
-	printf "OCaml: calling methods 'paths'\n";
-	options.path
+    method paths () = options.path
     method setPaths xs =
       do_update_paths model xs;
       self#updateDescription "";
