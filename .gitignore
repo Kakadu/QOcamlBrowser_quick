@@ -16,12 +16,12 @@ qrc_*.cpp
 *.swp
 
 # Generated files:
-AbstractModel_c.cpp
-AbstractModel_c.h
-HistoryModel_c.cpp
-HistoryModel_c.h
-DataItem_c.cpp
-DataItem_c.h
-Controller_c.cpp
-Controller_c.h
+abstractModel_c.c*
+abstractModel_c.h
+historyModel_c.c*
+historyModel_c.h
+dataItem_c.c*
+dataItem_c.h
+controller_c.c*
+controller_c.h
 
