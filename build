@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 #set -x
 
-#ocamlbuild -use-ocamlfind src/dataItem_c.o
-
 ocamlbuild -use-ocamlfind -j 2 \
     src/moc_dataItem.c src/moc_controller.c src/moc_abstractModel.c src/moc_historyModel.c \
     src/qrc_resources.c \
     src/libcppstubs.a \
     src/program.native #-verbose 5
+
