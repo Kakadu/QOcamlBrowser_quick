@@ -116,7 +116,13 @@ ApplicationWindow {
         id: root
         color: backgroundColor
         width: 800; height: 600;
-        anchors.fill: parent
+        anchors.fill: parent 
+        focus: true
+        Keys.onEscapePressed: Qt.quit()
+        Keys.onPressed: {
+          if ((event.key == Qt.Key_Q) && (event.modifiers & Qt.ControlModifier))
+            Qt.quit();
+        }
 
         states: [
             State {
@@ -146,7 +152,7 @@ ApplicationWindow {
             // get OCaml paths and set them to temporary model
             // So hackful because we need to convert QList<String> to Array
             var lst = controller.paths()
-	    //console.log("got paths from OCaml");
+            //console.log("got paths from OCaml");
             var ans = [];
             for (var x in lst ) {
               ans.push(lst[x]);
