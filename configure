@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-
+# check that files are compilable
 ocamlbuild -use-ocamlfind src/Controller.cmx src/DataItem.cmx src/AbstractModel.cmx src/HistoryModel.cmx
-cd _build
+
+# generate required .cpp and .h files
+cd _build # we are donig this in the _build dir to prevent sanitize errors
 ocamlfind opt -package lablqml -ppx "ppx_qt -destdir ../src/ -ext c" -c \
     src/Controller.ml src/DataItem.ml src/AbstractModel.ml src/HistoryModel.ml
-
 
