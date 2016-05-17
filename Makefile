@@ -1,15 +1,20 @@
+OB_OPTS=-j 2 #-verbose 5
+OB=ocamlbuild -use-ocamlfind  $(OB_OPTS)
 OUT=qocamlbrowser
+INSTALL=install -m 755
+
 .PHONY: all clean install uninstall
 
-all: 
-	./build
+all:
+	$(OB) src/moc_dataItem.c src/moc_controller.c src/moc_abstractModel.c src/moc_historyModel.c \
+    src/qrc_resources.c src/libcppstubs.a src/program.native
 
 clean:
-	rm -fr _build
+	$(RM) -fr _build *.native
 
+#use make install PREFIX=`opam config var prefix` to install
 install:
-	cp _build/src/program.native $(PREFIX)/bin/$(OUT)
+	$(INSTALL) _build/src/program.native $(PREFIX)/bin/$(OUT)
 
 uninstall:
-	rm -fr $(PREFIX)/bin/$(OUT)
-
+	$(RM) -r $(PREFIX)/bin/$(OUT)
