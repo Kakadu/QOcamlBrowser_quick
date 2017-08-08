@@ -1,4 +1,4 @@
-true: debug, warn(@6)
+true: debug, warn(@6), thread
 <src/*.ml*>: package(lablqml)
 <src/*.ml*>: thread, package(compiler-libs.common), package(str)
 <src/program.native>: use_qt5, package(compiler-libs.common), package(str), package(unix), package(lablqml), use_cppstubs,use_qrc_stub, thread

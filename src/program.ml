@@ -1,7 +1,7 @@
 open Printf
 open Helpers
 open HistoryZipper
-open QmlContext
+open Lablqml
 
 
 let () = Printexc.record_backtrace true

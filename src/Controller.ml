@@ -1,4 +1,4 @@
-open QmlContext
+open Lablqml
 
 class virtual controller = object(self)
 
@@ -16,4 +16,3 @@ class virtual controller = object(self)
   method virtual fullPath: string[@@qtprop]
 
 end[@@qtclass]
-

@@ -1,7 +1,7 @@
 open Helpers
 open HistoryModel
 open Printf
-open QmlContext
+open Lablqml
 
 class virtual listModelHelper cppobj = object(self)
   inherit historyModel cppobj as super
