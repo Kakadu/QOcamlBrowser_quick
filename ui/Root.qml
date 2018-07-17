@@ -7,8 +7,9 @@ ApplicationWindow {
     property int defaultFontSize: 19
     property int defaultTextFieldHeight: defaultFontSize + 4
     property string backgroundColor: "#FFFFDF"
+    width: 800
+    height: 600
 
-    //Keys.onEscapePressed: Qt.quit()
 /*
       menuBar: MenuBar {
         Menu {
