@@ -1,7 +1,7 @@
-true: debug, warn(@6), thread
+true: debug, warn(@6), thread, annot, bin_annot
 <src/*.ml*>: package(lablqml)
 <src/*.ml*>: thread, package(compiler-libs.common), package(str)
-<src/program.native>: use_qt5, package(compiler-libs.common), package(str), package(unix), package(lablqml), use_cppstubs,use_qrc_stub, thread
+<src/program.native>: use_qt5, package(compiler-libs.common,str,unix,lablqml), use_cppstubs,use_qrc_stub, thread
 
 <src/DataItem.ml>: use_ppx_qt
 <src/Controller.ml>: use_ppx_qt
@@ -12,11 +12,6 @@ true: debug, warn(@6), thread
 <src/controller_c.c>:    mocml_generated
 <src/abstractModel_c.c>: mocml_generated
 <src/historyModel_c.c>:  mocml_generated
-
-#<src/dataItem.h>:      qtmoc
-#<src/controller.h>:    qtmoc
-#<src/abstractModel.h>: qtmoc
-#<src/historyModel.h>:  qtmoc
 
 <src/moc_dataItem.c>:      qtmoc_generated
 <src/moc_controller.c>:    qtmoc_generated

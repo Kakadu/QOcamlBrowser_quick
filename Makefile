@@ -3,14 +3,15 @@ OB=ocamlbuild -use-ocamlfind  $(OB_OPTS)
 OUT=qocamlbrowser
 INSTALL=install -m 755
 
-.PHONY: all clean install uninstall
+.PHONY: all celan clean install uninstall
 
 all:
 	$(OB) src/moc_dataItem.c src/moc_controller.c src/moc_abstractModel.c src/moc_historyModel.c \
     src/qrc_resources.c src/libcppstubs.a src/program.native
 
+celan: clean
 clean:
-	$(RM) -fr _build *.native
+	$(RM) -r _build *.native
 
 #use make install PREFIX=`opam config var prefix` to install
 install:

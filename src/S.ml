@@ -26,8 +26,8 @@ let process_cmi_file filename : Types.signature =
   sign
 
 module Types_helpers = struct
-  let make_mod_struct ~name:name_ children =
-    Types.Sig_module (Ident.({name=name_; flags=0;stamp=0}),
+  let make_mod_struct ~name children =
+    Types.Sig_module (Ident.create name,
                       {md_type=Types.Mty_signature children; md_attributes=[]; md_loc=Location.none},
                       Types.Trec_not)
 end

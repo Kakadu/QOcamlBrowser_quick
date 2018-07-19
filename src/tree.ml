@@ -13,25 +13,25 @@ let is_module = function
   | ___ -> false
 
 let name_of_item = function
-  | Types.Sig_value     ({Ident.name;_},_)   -> name
-  | Types.Sig_type      ({Ident.name;_},_,_) -> name
-  | Types.Sig_typext    ({Ident.name;_},_,_) -> name
-  | Types.Sig_module    ({Ident.name;_},_,_) -> name
-  | Types.Sig_modtype   ({Ident.name;_},_)   -> name
-  | Types.Sig_class     ({Ident.name;_},_,_) -> name
-  | Types.Sig_class_type({Ident.name;_},_,_) -> name
+  | Types.Sig_value     (id,_)   -> Ident.name id
+  | Types.Sig_type      (id,_,_) -> Ident.name id
+  | Types.Sig_typext    (id,_,_) -> Ident.name id
+  | Types.Sig_module    (id,_,_) -> Ident.name id
+  | Types.Sig_modtype   (id,_)   -> Ident.name id
+  | Types.Sig_class     (id,_,_) -> Ident.name id
+  | Types.Sig_class_type(id,_,_) -> Ident.name id
 
 let rec of_sig_item internal =
   match internal with
-  | Types.Sig_value     ({Ident.name;_},_)  -> {name; internal; sons=[]}
-  | Types.Sig_type      ({Ident.name;_},_,_)  -> {name; internal; sons=[]}
-  | Types.Sig_typext    ({Ident.name;_},_,_)  -> {name; internal; sons=[]}
-  | Types.Sig_module    ({Ident.name;_},{md_type=Mty_signature sons},_) ->
-      {name; internal; sons=List.map sons ~f:of_sig_item}
-  | Types.Sig_module    ({Ident.name;_},_,_) -> {name; internal; sons=[]}
-  | Types.Sig_modtype   ({Ident.name;_},_)   -> {name; internal; sons=[]}
-  | Types.Sig_class     ({Ident.name;_},_,_) -> {name; internal; sons=[]}
-  | Types.Sig_class_type({Ident.name;_},_,_) -> {name; internal; sons=[]}
+  | Types.Sig_value     (id,_)    -> {name=Ident.name id; internal; sons=[]}
+  | Types.Sig_type      (id,_,_)  -> {name=Ident.name id; internal; sons=[]}
+  | Types.Sig_typext    (id,_,_)  -> {name=Ident.name id; internal; sons=[]}
+  | Types.Sig_module    (id,{md_type=Mty_signature sons},_) ->
+      {name=Ident.name id; internal; sons=List.map sons ~f:of_sig_item}
+  | Types.Sig_module    (id,_,_) -> {name=Ident.name id; internal; sons=[]}
+  | Types.Sig_modtype   (id,_)   -> {name=Ident.name id; internal; sons=[]}
+  | Types.Sig_class     (id,_,_) -> {name=Ident.name id; internal; sons=[]}
+  | Types.Sig_class_type(id,_,_) -> {name=Ident.name id; internal; sons=[]}
 
 let print_sig fmt v =
   match v with
