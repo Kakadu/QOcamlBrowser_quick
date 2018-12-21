@@ -1,12 +1,12 @@
 <RCC>
   <qresource prefix="/">
-    <file>../ui/PathEditor.qml</file>
-    <file>../ui/Scrollable.qml</file>
-    <file>../ui/ScrollBar.qml</file>
-    <file>../ui/ApiBrowser.qml</file>
-    <file>../ui/Root.qml</file>
-    <file>../ui/main.js</file>
-    <file>../ui/pics/plus-sign.png</file>
-    <file>../ui/pics/minus-sign.png</file>
+    <file>../../ui/PathEditor.qml</file>
+    <file>../../ui/Scrollable.qml</file>
+    <file>../../ui/ScrollBar.qml</file>
+    <file>../../ui/ApiBrowser.qml</file>
+    <file>../../ui/Root.qml</file>
+    <file>../../ui/main.js</file>
+    <file>../../ui/pics/plus-sign.png</file>
+    <file>../../ui/pics/minus-sign.png</file>
   </qresource>
 </RCC>

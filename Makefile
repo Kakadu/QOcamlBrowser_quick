@@ -1,4 +1,4 @@
-OB_OPTS=-j 2 #-verbose 5
+OB_OPTS=-j 2 -classic-display #-verbose 5
 OB=ocamlbuild -use-ocamlfind  $(OB_OPTS)
 OUT=qocamlbrowser
 INSTALL=install -m 755
