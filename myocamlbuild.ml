@@ -15,6 +15,15 @@ let pkg_config flags package =
   in
   with_temp_file "pkgconfig" "pkg-config" cmd
 
+let check_which s =
+ if Sys.command (Printf.sprintf "which %s-qt5" s) = 0
+ then Printf.sprintf "%s-qt5" s
+ else s
+
+let cmd_rcc = check_which "rcc"
+let cmd_moc = check_which "moc"
+
+
 let pkg_config_lib ~lib (*~has_lib ~stublib *) =
   let cflags = (*(A has_lib) :: *) pkg_config "cflags" lib in (*
   let stub_l = [A (Printf.sprintf "-l%s" stublib)] in *)
@@ -61,7 +70,7 @@ let () =
       ~dep:"%(path)%(modname).h"
       (begin fun env build ->
         tag_file (env "%(path)%(modname).h") ["qtmoc"];
-        Cmd (S [A "moc"; P (env "%(path)%(modname).h"); Sh ">"; P (env "%(path)moc_%(modname).c")]);
+        Cmd (S [A cmd_moc; P (env "%(path)%(modname).h"); Sh ">"; P (env "%(path)moc_%(modname).c")]);
        end);
 
     rule "Qt resource: %.qrc -> qrc_%.c"
@@ -70,7 +79,7 @@ let () =
       (begin fun env _ ->
         (*
         tag_file (env "%(path)%(modname).h") ["qt_resource"]; *)
-        Cmd(S[ A"rcc"; A"-name"; A(env "%(modname)"); P (env "%(path)%(modname).qrc")
+        Cmd(S[ A cmd_rcc; A"-name"; A(env "%(modname)"); P (env "%(path)%(modname).qrc")
              ; A "-o"; P (env "%(path)qrc_%(modname).c")])
        end);
 
