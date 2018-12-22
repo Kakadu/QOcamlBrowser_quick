@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 
+set +xe
 # check that files are compilable
 ocamlbuild -use-ocamlfind src/Controller.cmx src/DataItem.cmx src/AbstractModel.cmx src/HistoryModel.cmx
+
+
+RCC=rcc
+which rcc-qt5
+if [ $? != 0 ]; then
+    RCC=rcc
+fi
+$RCC -name resources src/resources.qrc -o src/qrc_resources.c
 
 # generate required .cpp and .h files
 cd _build # we are donig this in the _build dir to prevent sanitize errors

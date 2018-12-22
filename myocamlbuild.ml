@@ -73,15 +73,15 @@ let () =
         Cmd (S [A cmd_moc; P (env "%(path)%(modname).h"); Sh ">"; P (env "%(path)moc_%(modname).c")]);
        end);
 
-    rule "Qt resource: %.qrc -> qrc_%.c"
-      ~prods:["%(path:<**/>)qrc_%(modname:<*>).c"]
-      ~deps:("%(path)%(modname).qrc" :: resource_depends)
-      (begin fun env _ ->
-        (*
-        tag_file (env "%(path)%(modname).h") ["qt_resource"]; *)
-        Cmd(S[ A cmd_rcc; A"-name"; A(env "%(modname)"); P (env "%(path)%(modname).qrc")
-             ; A "-o"; P (env "%(path)qrc_%(modname).c")])
-       end);
+    (* rule "Qt resource: %.qrc -> qrc_%.c"
+     *   ~prods:["%(path:<**/>)qrc_%(modname:<*>).c"]
+     *   ~deps:("%(path)%(modname).qrc" :: resource_depends)
+     *   (begin fun env _ ->
+     *     (\*
+     *     tag_file (env "%(path)%(modname).h") ["qt_resource"]; *\)
+     *     Cmd(S[ A cmd_rcc; A"-name"; A(env "%(modname)"); P (env "%(path)%(modname).qrc")
+     *          ; A "-o"; P (env "%(path)qrc_%(modname).c")])
+     *    end); *)
 
     pkg_config_lib ~lib:"Qt5Quick Qt5Widgets";
     flag ["ocaml"; "compile"; "use_ppx_qt"] (S[A"-ppx"; A"ppx_qt --as-ppx -nocpp"(*; A"-dsource"*)]);

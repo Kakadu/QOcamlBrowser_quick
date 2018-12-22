@@ -6,14 +6,12 @@ INSTALL=install -m 755
 .PHONY: all celan clean install uninstall
 
 all:
-	find .
-	$(OB) src/moc_dataItem.c src/moc_controller.c src/moc_abstractModel.c src/moc_historyModel.c 
-	find .
-	$(OB) src/qrc_resources.c src/libcppstubs.a src/program.native
+	$(OB) src/moc_dataItem.c src/moc_controller.c src/moc_abstractModel.c src/moc_historyModel.c
+	$(OB) src/libcppstubs.a src/program.native
 
 celan: clean
 clean:
-	$(RM) -r _build *.native
+	$(RM) -r _build *.native src/qrc_resources.c
 
 #use make install PREFIX=`opam config var prefix` to install
 install:
