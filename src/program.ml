@@ -338,5 +338,5 @@ let main () =
   set_context_property ~ctx:(get_view_exn ~name:"rootContext") ~name:"controller" controller#handler
 
 let () =
-  run_with_QQmlApplicationEngine Sys.argv main "qrc:///ui/Root.qml"
+  run_with_QQmlApplicationEngine Sys.argv main "qrc:///Root.qml"
   (*run_with_QQmlApplicationEngine Sys.argv main "Root.qml"*)

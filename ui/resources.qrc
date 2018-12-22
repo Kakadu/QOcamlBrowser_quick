@@ -1,0 +1,12 @@
+<RCC>
+  <qresource prefix="/">
+    <file>PathEditor.qml</file>
+    <file>Scrollable.qml</file>
+    <file>ScrollBar.qml</file>
+    <file>ApiBrowser.qml</file>
+    <file>Root.qml</file>
+    <file>main.js</file>
+    <file>pics/plus-sign.png</file>
+    <file>pics/minus-sign.png</file>
+  </qresource>
+</RCC>

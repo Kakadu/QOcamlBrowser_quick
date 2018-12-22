@@ -11,8 +11,8 @@ fi
 
 find .
 
-cd src 
-$RCC -name resources resources.qrc -o qrc_resources.c
+cd ui 
+$RCC -name resources resources.qrc -o ../src/qrc_resources.c
 cd ..
 
 # generate required .cpp and .h files
