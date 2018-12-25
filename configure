@@ -1,15 +1,18 @@
-set -x
+set -x 
 # check that files are compilable
 ocamlbuild -use-ocamlfind src/Controller.cmx src/DataItem.cmx src/AbstractModel.cmx src/HistoryModel.cmx
 
 
-RCC=rcc
-which rcc-qt5
+RCC=rcc-qt5
+which $RCC
 if [ $? != 0 ]; then
     RCC=rcc
 fi
-
-find .
+which $RCC
+if [ $? != 0 ]; then 
+  echo "rcc not found."
+  exit 1
+fi
 
 cd ui 
 $RCC -name resources resources.qrc -o ../src/qrc_resources.c
