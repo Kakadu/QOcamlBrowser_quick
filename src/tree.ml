@@ -9,39 +9,28 @@ type 'a tree = {
 open Types
 
 let is_module = function
-  | Types.Sig_module (_,_,_) -> true
+  | Types.Sig_module _ -> true
   | ___ -> false
 
-let name_of_item = function
-  | Types.Sig_value     (id,_)   -> Ident.name id
-  | Types.Sig_type      (id,_,_) -> Ident.name id
-  | Types.Sig_typext    (id,_,_) -> Ident.name id
-  | Types.Sig_module    (id,_,_) -> Ident.name id
-  | Types.Sig_modtype   (id,_)   -> Ident.name id
-  | Types.Sig_class     (id,_,_) -> Ident.name id
-  | Types.Sig_class_type(id,_,_) -> Ident.name id
+let name_of_item si = Ident.name @@ Types.signature_item_id si
 
 let rec of_sig_item internal =
   match internal with
-  | Types.Sig_value     (id,_)    -> {name=Ident.name id; internal; sons=[]}
-  | Types.Sig_type      (id,_,_)  -> {name=Ident.name id; internal; sons=[]}
-  | Types.Sig_typext    (id,_,_)  -> {name=Ident.name id; internal; sons=[]}
-  | Types.Sig_module    (id,{md_type=Mty_signature sons},_) ->
+  | Types.Sig_module    (id,_,{md_type=Mty_signature sons},_,_) ->
       {name=Ident.name id; internal; sons=List.map sons ~f:of_sig_item}
-  | Types.Sig_module    (id,_,_) -> {name=Ident.name id; internal; sons=[]}
-  | Types.Sig_modtype   (id,_)   -> {name=Ident.name id; internal; sons=[]}
-  | Types.Sig_class     (id,_,_) -> {name=Ident.name id; internal; sons=[]}
-  | Types.Sig_class_type(id,_,_) -> {name=Ident.name id; internal; sons=[]}
+  | _ ->
+    let name = name_of_item internal in 
+    {name; internal; sons=[]}
 
 let print_sig fmt v =
   match v with
-  | Types.Sig_value     (id,desc)    -> Printtyp.value_description id fmt desc
-  | Types.Sig_type      (id,desc,_)  -> Printtyp.type_declaration  id fmt desc
-  | Types.Sig_typext    (id,desc,_)  -> Printtyp.extension_constructor  id fmt desc
-  | Types.Sig_module    (id,desc,_)  -> Format.fprintf fmt "<no data>\n"
-  | Types.Sig_modtype   (id,desc)    -> Printtyp.modtype_declaration  id fmt desc
-  | Types.Sig_class     (id,desc,_) -> Printtyp.class_declaration   id fmt desc
-  | Types.Sig_class_type(id,desc,_) -> Printtyp.cltype_declaration  id fmt desc;
+  | Types.Sig_value     (id,desc,_)    -> Printtyp.value_description id fmt desc
+  | Types.Sig_type      (id,desc,_,_)  -> Printtyp.type_declaration  id fmt desc
+  | Types.Sig_typext    (id,desc,_,_)  -> Printtyp.extension_constructor  id fmt desc
+  | Types.Sig_module    (id,_,desc,_,_)  -> Format.fprintf fmt "<no data>\n"
+  | Types.Sig_modtype   (id,desc,_)    -> Printtyp.modtype_declaration  id fmt desc
+  | Types.Sig_class     (id,desc,_,_) -> Printtyp.class_declaration   id fmt desc
+  | Types.Sig_class_type(id,desc,_,_) -> Printtyp.cltype_declaration  id fmt desc;
   Format.pp_print_newline fmt ();
   Format.pp_print_flush fmt ()
 

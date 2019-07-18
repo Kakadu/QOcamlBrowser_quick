@@ -25,3 +25,5 @@ dataItem_c.h
 controller_c.c*
 controller_c.h
 
+src/qrc_resources.c
+

@@ -27,9 +27,11 @@ let process_cmi_file filename : Types.signature =
 
 module Types_helpers = struct
   let make_mod_struct ~name children =
-    Types.Sig_module (Ident.create name,
+    Types.Sig_module (Ident.create_local name,
+                      Mp_present,
                       {md_type=Types.Mty_signature children; md_attributes=[]; md_loc=Location.none},
-                      Types.Trec_not)
+                      Types.Trec_not,
+                      Types.Exported)
 end
 
 let read_modules dirs : Types.signature_item list =
@@ -58,7 +60,7 @@ let compare a b =
   let helper = function
   | Types.Sig_type        _ -> 0
   | Types.Sig_modtype     _ -> 1
-  | Types.Sig_module (_,{md_type=Types.Mty_functor _; _},_) -> 3
+  | Types.Sig_module (_,_,{md_type=Types.Mty_functor _; _},_,_) -> 3
   | Types.Sig_module      _ -> 2
   | Types.Sig_class       _ -> 6
   | Types.Sig_class_type  _ -> 7
@@ -78,7 +80,7 @@ let sort_of_sig_item = function
   | Types.Sig_value       _ -> "v"
   | Types.Sig_type        _ -> "t"
   | Types.Sig_typext      _ -> "ext"
-  | Types.Sig_module (_,{md_type=Types.Mty_functor _;_},_) -> "f"
+  | Types.Sig_module (_,_,{md_type=Types.Mty_functor _;_},_,_) -> "f"
   | Types.Sig_module      _ -> "m"
   | Types.Sig_modtype     _ -> "mt"
   | Types.Sig_class       _ -> "c"
