@@ -1,8 +1,11 @@
-opam-version: "1.2"
-maintainer: "kakadu.hafanana@gmail.com"
+opam-version: "2.0"
+
+maintainer: "kakadu@pm.me"
+synopsis: """A clone of Tcl/Tk ocamlbrowser"""
 homepage: "https://github.com/Kakadu/QOcamlBrowser_quick"
 bug-reports: "https://github.com/Kakadu/QOcamlBrowser_quick/issues"
 authors: "Kakadu"
+
 build: [
   ["sh" "-exc" "PATH=/usr/lib64/qt5/bin:/usr/lib/qt5/bin:$PATH ./configure"]
   ["sh" "-exc" "PATH=/usr/lib64/qt5/bin:/usr/lib/qt5/bin:$PATH make"]
@@ -11,11 +14,12 @@ install: [make "install" "PREFIX=%{prefix}%"]
 remove: [
   [make "uninstall"]
 ]
+
 depends: [
-  "lablqml" {>= "0.5.1"}
+  "lablqml" {>= "0.7"}
   "conf-qt" {>= "5.2.1"}
   "ocamlbuild" {build}
 ]
+
 dev-repo: "git://github.com/Kakadu/QOcamlBrowser_quick"
-available: (ocaml-version >= "4.07.0")
 
