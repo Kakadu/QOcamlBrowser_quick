@@ -29,7 +29,7 @@ module Types_helpers = struct
   let make_mod_struct ~name children =
     Types.Sig_module (Ident.create_local name,
                       Mp_present,
-                      {md_type=Types.Mty_signature children; md_attributes=[]; md_loc=Location.none},
+                      {md_uid=Types.Uid.mk ~current_unit:name; md_type=Types.Mty_signature children; md_attributes=[]; md_loc=Location.none},
                       Types.Trec_not,
                       Types.Exported)
 end
